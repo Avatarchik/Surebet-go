@@ -19,14 +19,15 @@ func Run(address string, logEnabled bool) (*CDPInfo, error) {
 	ctxt, cancel := context.WithCancel(context.Background())
 	var options []chromedp.Option
 
-	path := "/usr/bin/google-chrome"
 	options = []chromedp.Option{chromedp.WithRunnerOptions(
-		runner.Headless(path, 9222),
+		runner.Port(9222),
 		runner.Flag("headless", true),
 		runner.Flag("disable-gpu", true),
 		runner.Flag("remote-debugging-address", address),
+		runner.Flag("no-first-run", true),
+		runner.Flag("no-default-browser-check", true),
+		runner.UserDataDir(os.ExpandEnv("$HOME/ChromeDebug")),
 		//runner.Flag("blink-settings", "imagesEnabled=false"),
-		runner.Flag("user-data-dir", os.ExpandEnv("$HOME/ChromeDebug")),
 	)}
 
 	if logEnabled {
