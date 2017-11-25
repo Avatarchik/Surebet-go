@@ -27,6 +27,6 @@ func Benchmark(times int, funcs []FuncInfo) {
 		fmt.Println()
 	}
 	for ind, curFunc := range funcs {
-		fmt.Printf("\nFunc \"%s\" avarage time: %s\n", curFunc.Name, sumDurations[ind]/time.Duration(times))
+		fmt.Printf("\nFunc \"%s\" average time: %s\n", curFunc.Name, sumDurations[ind]/time.Duration(times))
 	}
 }

@@ -6,31 +6,32 @@ import (
 	"surebetSearch/chrome"
 )
 
-func Load(cdpInfo *chrome.CDPInfo) (string, error){
+func Load(cdpInfo *chrome.CDPInfo) (string, error) {
 	ctxt, c := cdpInfo.Ctxt, cdpInfo.C
 	url := "https://www.fonbet104.com/live/"
 	expandBtn := "#lineTableHeaderButton"
-	expandAll := "#lineHeaderViewActionMenu > div:nth-child(6)"
+	expandAll := "#lineHeaderViewActionMenu > .popupMenuItem:nth-child(6)"
 	var html string
 
 	// run task list
-	if err := c.Run(ctxt, clickButtons(url, expandBtn, expandAll, &html)); err != nil {
+	if err := c.Run(ctxt, expandClick(url, expandBtn, expandAll, &html)); err != nil {
 		return "", err
 	}
 
-	if err := common.SaveHtml(url, html); err != nil{
+	if err := common.SaveHtml(url, html); err != nil {
 		return "", err
 	}
 	return html, nil
 }
 
-func clickButtons(url, btn, btnAll string, html *string) chromedp.Tasks {
+func expandClick(url, expandBtn, expandAll string, html *string) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(url),
-		chromedp.WaitVisible(btn),
-		chromedp.Click(btn, chromedp.NodeVisible),
-		chromedp.WaitVisible(btnAll),
-		chromedp.Click(btnAll, chromedp.NodeVisible),
+		chromedp.WaitReady(expandBtn),
+		chromedp.Click(expandBtn),
+		chromedp.WaitReady(expandAll),
+		chromedp.Click(expandAll),
+		chromedp.WaitNotVisible(expandAll),
 		common.SaveScn(url),
 		chromedp.OuterHTML("html", html),
 	}

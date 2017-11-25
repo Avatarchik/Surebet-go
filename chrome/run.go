@@ -6,7 +6,6 @@ import (
 	"os"
 	"context"
 	"log"
-	"github.com/knq/chromedp/client"
 )
 
 type CDPInfo struct {
@@ -15,24 +14,21 @@ type CDPInfo struct {
 	Cancel context.CancelFunc
 }
 
-func Run(address string, isNative, logEnabled bool) (*CDPInfo, error) {
+func Run(address string, logEnabled bool) (*CDPInfo, error) {
 	// create context
 	ctxt, cancel := context.WithCancel(context.Background())
 	var options []chromedp.Option
-	if isNative {
-		port := 9223
-		path := "/usr/bin/google-chrome"
-		options = []chromedp.Option{chromedp.WithRunnerOptions(
-			runner.Headless(path, port),
-			runner.Flag("headless", true),
-			runner.Flag("disable-gpu", true),
-			runner.Flag("remote-debugging-address", address),
-			//runner.Flag("blink-settings", "imagesEnabled=false"),
-			runner.Flag("user-data-dir", os.ExpandEnv("$HOME/ChromeDebug")),
-		)}
-	} else {
-		options = []chromedp.Option{chromedp.WithTargets(client.New().WatchPageTargets(ctxt))}
-	}
+
+	path := "/usr/bin/google-chrome"
+	options = []chromedp.Option{chromedp.WithRunnerOptions(
+		runner.Headless(path, 9222),
+		runner.Flag("headless", true),
+		runner.Flag("disable-gpu", true),
+		runner.Flag("remote-debugging-address", address),
+		//runner.Flag("blink-settings", "imagesEnabled=false"),
+		runner.Flag("user-data-dir", os.ExpandEnv("$HOME/ChromeDebug")),
+	)}
+
 	if logEnabled {
 		options = append(options, chromedp.WithLog(log.Printf))
 	}
