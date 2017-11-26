@@ -2,29 +2,43 @@ package fonbet
 
 import (
 	"github.com/knq/chromedp"
-	"surebetSearch/common"
 	"surebetSearch/chrome"
+	"github.com/knq/chromedp/client"
 )
 
-func Load(cdpInfo *chrome.CDPInfo) (string, error) {
-	ctxt, c := cdpInfo.Ctxt, cdpInfo.C
-	url := "https://www.fonbet104.com/live/"
-	expandBtn := "#lineTableHeaderButton"
-	expandAll := "#lineHeaderViewActionMenu > .popupMenuItem:nth-child(6)"
-	var html string
+var url = "https://www.fonbet104.com/live/"
+var expand = "#lineTableHeaderButton"
+var expandAll = "#lineHeaderViewActionMenu > div:nth-child(6)"
 
-	// run task list
-	if err := c.Run(ctxt, expandClick(url, expandBtn, expandAll, &html)); err != nil {
-		return "", err
+func LoadClient(cdpInfo *chrome.CDPInfo, targetClient *client.Client) error {
+	target, err := targetClient.NewPageTarget(cdpInfo.Ctxt)
+	if err != nil {
+		return err
 	}
+	cdpInfo.C.AddTarget(cdpInfo.Ctxt, target)
+	cdpInfo.C.SetHandlerByID(target.GetID())
 
-	if err := common.SaveHtml(url, html); err != nil {
-		return "", err
+	if err := cdpInfo.C.Run(cdpInfo.Ctxt, initLoad(url, expand, expandAll)); err != nil {
+		return err
 	}
-	return html, nil
+	return nil
 }
 
-func expandClick(url, expandBtn, expandAll string, html *string) chromedp.Tasks {
+func Load(cdpInfo *chrome.CDPInfo) error {
+	var targetID string
+	if err := cdpInfo.C.Run(cdpInfo.Ctxt, cdpInfo.C.NewTarget(&targetID)); err != nil {
+		return err
+	}
+	cdpInfo.C.SetHandlerByID(targetID)
+
+	// run task list
+	if err := cdpInfo.C.Run(cdpInfo.Ctxt, initLoad(url, expand, expandAll)); err != nil {
+		return err
+	}
+	return nil
+}
+
+func initLoad(url, expandBtn, expandAll string) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(url),
 		chromedp.WaitReady(expandBtn),
@@ -32,7 +46,5 @@ func expandClick(url, expandBtn, expandAll string, html *string) chromedp.Tasks 
 		chromedp.WaitReady(expandAll),
 		chromedp.Click(expandAll),
 		chromedp.WaitNotVisible(expandAll),
-		common.SaveScn(url),
-		chromedp.OuterHTML("html", html),
 	}
 }
