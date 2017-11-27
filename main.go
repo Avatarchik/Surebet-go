@@ -2,46 +2,72 @@ package main
 
 import (
 	"log"
-	"surebetSearch/chrome"
 	"surebetSearch/fonbet"
-	"github.com/knq/chromedp/client"
-	"fmt"
+	"surebetSearch/common"
+	"sync"
+	"context"
+	"github.com/knq/chromedp"
+	"surebetSearch/chrome"
 )
 
-func printTargets(cdpInfo *chrome.CDPInfo, targetClient *client.Client, msg string)  {
-	log.Printf("LIST OF TARGETS %s:", msg)
-	targets, err := targetClient.ListTargets(cdpInfo.Ctxt)
-	if err != nil{
-		log.Panic(err)
-	}
-	log.Println("CLient: ")
-	for _, target := range targets{
-		log.Println(target)
-	}
-	log.Println("CDP: ")
-	for _, target := range cdpInfo.C.ListTargets(){
-		log.Println(target)
-	}
-}
 
 func main() {
 	address := "0.0.0.0"
-	cdpInfo, err := chrome.Run(address, false)
-	if err != nil {
-		log.Panic(err)
-	}
-	defer chrome.Close(cdpInfo)
 
-	targetClient := client.New()
+	targetNumber := 10
 
-	printTargets(cdpInfo, targetClient, "Initially")
-
-	for i := 0 ; i < 3; i++{
-		if err := fonbet.Load(cdpInfo); err != nil{
+	tabsLoad := func() error{
+		cdpInfo, err := chrome.Run(address, false)
+		if err != nil {
 			log.Panic(err)
 		}
-		printTargets(cdpInfo, targetClient, fmt.Sprintf("After %d new tab", i+1))
+		defer chrome.Close(cdpInfo)
+
+		for i := 0; i < targetNumber; i++ {
+			if err := fonbet.Load(cdpInfo); err != nil {
+				return err
+			}
+			//chrome.PrintTargets(cdpInfo)
+			var html string
+			if err := cdpInfo.C.Run(cdpInfo.Ctxt, chrome.GetHtml(&html)); err != nil {
+				return err
+			}
+			log.Printf("Html size: %d", len(html))
+		}
+		return nil
 	}
 
-	//common.Benchmark(5, []common.FuncInfo{{fonbetNative, "fonbetNative"}})
+	poolLoad := func() error{
+		ctxt, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		port := 9222
+		// create pool
+		pool, err := chromedp.NewPool(chromedp.PortRange(port, port + targetNumber + 1))
+		if err != nil {
+			return err
+		}
+		// loop over the URLs
+		var wg sync.WaitGroup
+		for i := 0; i < targetNumber; i++{
+			wg.Add(1)
+			go fonbet.LoadPool(ctxt, &wg, pool, i)
+		}
+		// wait for to finish
+		wg.Wait()
+
+		// shutdown pool
+		err = pool.Shutdown()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	if err := common.Benchmark(1, []common.FuncInfo{
+		{poolLoad, "poolLoad"},
+		{tabsLoad, "tabsLoad"},
+		}); err != nil{
+			log.Panic(err)
+	}
 }

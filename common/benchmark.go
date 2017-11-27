@@ -12,13 +12,13 @@ type FuncInfo struct {
 	Name string
 }
 
-func Benchmark(times int, funcs []FuncInfo) {
+func Benchmark(times int, funcs []FuncInfo) error{
 	sumDurations := make([]time.Duration, len(funcs))
 	for n := 0; n < times; n++ {
 		for ind, curFunc := range funcs {
 			start := time.Now()
 			if err := curFunc.Fn(); err != nil {
-				panic(err)
+				return err
 			}
 			duration := time.Since(start)
 			sumDurations[ind] += duration
@@ -29,4 +29,5 @@ func Benchmark(times int, funcs []FuncInfo) {
 	for ind, curFunc := range funcs {
 		fmt.Printf("\nFunc \"%s\" average time: %s\n", curFunc.Name, sumDurations[ind]/time.Duration(times))
 	}
+	return nil
 }

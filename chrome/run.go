@@ -17,9 +17,8 @@ type CDPInfo struct {
 func Run(address string, logEnabled bool) (*CDPInfo, error) {
 	// create context
 	ctxt, cancel := context.WithCancel(context.Background())
-	var options []chromedp.Option
 
-	options = []chromedp.Option{chromedp.WithRunnerOptions(
+	options := []chromedp.Option{chromedp.WithRunnerOptions(
 		runner.Port(9222),
 		runner.Flag("headless", true),
 		runner.Flag("disable-gpu", true),
@@ -29,7 +28,6 @@ func Run(address string, logEnabled bool) (*CDPInfo, error) {
 		runner.UserDataDir(os.ExpandEnv("$HOME/ChromeDebug")),
 		//runner.Flag("blink-settings", "imagesEnabled=false"),
 	)}
-
 	if logEnabled {
 		options = append(options, chromedp.WithLog(log.Printf))
 	}

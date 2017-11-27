@@ -1,13 +1,16 @@
 package chrome
 
 import (
-	"github.com/knq/chromedp"
-	"github.com/knq/chromedp/cdp"
 	"io/ioutil"
 	"context"
 	"log"
 	"surebetSearch/common"
+	"github.com/knq/chromedp"
+	"github.com/knq/chromedp/cdp"
+	"github.com/knq/chromedp/client"
 )
+
+var targetClient = client.New()
 
 func SaveScn(url string) chromedp.ActionFunc {
 	return func(ctxt context.Context, c cdp.Handler) error {
@@ -32,3 +35,14 @@ func GetHtml(html *string) chromedp.ActionFunc {
 	}
 }
 
+func PrintTargets(cdpInfo *CDPInfo) {
+	targets, err := targetClient.ListTargets(cdpInfo.Ctxt)
+	if err != nil {
+		log.Panic(err)
+	}
+	log.Printf("Opened tabs: %d", len(targets)-1)
+	log.Println("CLient: ")
+	for _, target := range targets {
+		log.Println(target)
+	}
+}

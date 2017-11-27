@@ -3,25 +3,46 @@ package fonbet
 import (
 	"github.com/knq/chromedp"
 	"surebetSearch/chrome"
-	"github.com/knq/chromedp/client"
+	"sync"
+	"context"
+	"log"
+	"github.com/knq/chromedp/runner"
 )
 
 var url = "https://www.fonbet104.com/live/"
 var expand = "#lineTableHeaderButton"
 var expandAll = "#lineHeaderViewActionMenu > div:nth-child(6)"
 
-func LoadClient(cdpInfo *chrome.CDPInfo, targetClient *client.Client) error {
-	target, err := targetClient.NewPageTarget(cdpInfo.Ctxt)
-	if err != nil {
-		return err
-	}
-	cdpInfo.C.AddTarget(cdpInfo.Ctxt, target)
-	cdpInfo.C.SetHandlerByID(target.GetID())
+func LoadPool(ctxt context.Context, wg *sync.WaitGroup, pool *chromedp.Pool, id int) {
+	defer wg.Done()
 
-	if err := cdpInfo.C.Run(cdpInfo.Ctxt, initLoad(url, expand, expandAll)); err != nil {
-		return err
+	options := []runner.CommandLineOption{
+		runner.ExecPath("/usr/bin/google-chrome"),
+		runner.Flag("headless", true),
+		runner.Flag("disable-gpu", true),
+		runner.Flag("remote-debugging-address", "0.0.0.0"),
+		runner.Flag("no-first-run", true),
+		runner.Flag("no-default-browser-check", true),
 	}
-	return nil
+
+	// allocate
+	c, err := pool.Allocate(ctxt, options...)
+	if err != nil {
+		log.Printf("id# %d error: %v", id, err)
+		return
+	}
+	defer c.Release()
+
+	if err := c.Run(ctxt, initLoad(url, expand, expandAll)); err != nil {
+		log.Printf("id# %d error: %v", id, err)
+		return
+	}
+	var html string
+	if err := c.Run(ctxt, chrome.GetHtml(&html)); err != nil {
+		log.Printf("id# %d error: %v", id, err)
+		return
+	}
+	log.Printf("Html size: %d", len(html))
 }
 
 func Load(cdpInfo *chrome.CDPInfo) error {
