@@ -60,7 +60,7 @@ func ExecActions(ctxt context.Context, targets []*chromedp.Res, actions []chrome
 	targetNumber := len(targets)
 
 	if targetNumber != len(actions) {
-		return []error{errors.New("numbers of actions and targets are not equal")}
+		return []error{errors.New("number of actions is not equal to number of targets")}
 	}
 
 	errChan := make(chan error, targetNumber)
