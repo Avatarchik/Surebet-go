@@ -7,10 +7,7 @@ import (
 	"surebetSearch/common"
 	"github.com/knq/chromedp"
 	"github.com/knq/chromedp/cdp"
-	"github.com/knq/chromedp/client"
 )
-
-var targetClient = client.New()
 
 func SaveScn(url string) chromedp.ActionFunc {
 	return func(ctxt context.Context, c cdp.Handler) error {
@@ -31,18 +28,7 @@ func SaveScn(url string) chromedp.ActionFunc {
 func GetHtml(html *string) chromedp.ActionFunc {
 	return func(ctxt context.Context, c cdp.Handler) error {
 		chromedp.OuterHTML("html", html).Do(ctxt, c)
+		log.Printf("Html size: %d", len(*html))
 		return nil
-	}
-}
-
-func PrintTargets(cdpInfo *CDPInfo) {
-	targets, err := targetClient.ListTargets(cdpInfo.Ctxt)
-	if err != nil {
-		log.Panic(err)
-	}
-	log.Printf("Opened tabs: %d", len(targets)-1)
-	log.Println("CLient: ")
-	for _, target := range targets {
-		log.Println(target)
 	}
 }

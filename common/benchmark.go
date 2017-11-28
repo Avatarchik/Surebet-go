@@ -5,14 +5,22 @@ import (
 	"fmt"
 )
 
-type TestFunc func() error
-
 type FuncInfo struct {
-	Fn   TestFunc
+	Fn   func() error
 	Name string
 }
 
-func Benchmark(times int, funcs []FuncInfo) error{
+type FuncsInfo []FuncInfo
+
+func Benchmark(times int, funcs FuncsInfo) error {
+	if times > 1 {
+		for _, curFunc := range funcs {
+			if err := curFunc.Fn(); err != nil {
+				return err
+			}
+			fmt.Printf("Test run: func \"%s\"", curFunc.Name)
+		}
+	}
 	sumDurations := make([]time.Duration, len(funcs))
 	for n := 0; n < times; n++ {
 		for ind, curFunc := range funcs {

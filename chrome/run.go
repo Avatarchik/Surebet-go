@@ -1,48 +1,90 @@
 package chrome
 
 import (
+	"context"
 	"github.com/knq/chromedp"
 	"github.com/knq/chromedp/runner"
-	"os"
-	"context"
+	"fmt"
 	"log"
+	"sync"
 )
 
-type CDPInfo struct {
-	Ctxt   context.Context
-	C      *chromedp.CDP
-	Cancel context.CancelFunc
+type RunReply struct {
+	Ctxt    context.Context
+	Pool    *chromedp.Pool
+	Cancel  context.CancelFunc
+	Targets []*chromedp.Res
 }
 
-func Run(address string, logEnabled bool) (*CDPInfo, error) {
-	// create context
-	ctxt, cancel := context.WithCancel(context.Background())
-
-	options := []chromedp.Option{chromedp.WithRunnerOptions(
-		runner.Port(9222),
+func RunPool(targetNumber int, address string) (RunReply, error) {
+	var options = []runner.CommandLineOption{
+		runner.ExecPath("/usr/bin/google-chrome"),
 		runner.Flag("headless", true),
 		runner.Flag("disable-gpu", true),
 		runner.Flag("remote-debugging-address", address),
 		runner.Flag("no-first-run", true),
 		runner.Flag("no-default-browser-check", true),
-		runner.UserDataDir(os.ExpandEnv("$HOME/ChromeDebug")),
-		//runner.Flag("blink-settings", "imagesEnabled=false"),
-	)}
-	if logEnabled {
-		options = append(options, chromedp.WithLog(log.Printf))
 	}
-	// create chrome instance
-	c, err := chromedp.New(ctxt, options...)
+
+	ctxt, cancel := context.WithCancel(context.Background())
+
+	startPort := 9222
+	// create pool
+	pool, err := chromedp.NewPool(chromedp.PortRange(startPort, startPort+targetNumber))
 	if err != nil {
-		return &CDPInfo{}, err
+		return RunReply{}, err
 	}
-	return &CDPInfo{ctxt, c, cancel}, nil
+
+	targets := make([]*chromedp.Res, targetNumber)
+	for i := 0; i < targetNumber; i++ {
+		// allocate
+		targets[i], err = pool.Allocate(ctxt, options...)
+		if err != nil {
+			return RunReply{}, fmt.Errorf("instance# %d error: %v", i, err)
+		}
+	}
+
+	return RunReply{ctxt, pool, cancel, targets}, nil
 }
 
-func Close(cdpInfo *CDPInfo) {
-	// shutdown chrome
-	if err := cdpInfo.C.Shutdown(cdpInfo.Ctxt); err != nil {
+func load(ctxt context.Context, wg *sync.WaitGroup, errChan chan error, target *chromedp.Res, loadFunc chromedp.Action) {
+	defer wg.Done()
+
+	if err := target.Run(ctxt, loadFunc); err != nil {
+		errChan <- err
+	}
+}
+
+func ExecActions(ctxt context.Context, targets []*chromedp.Res, loadFuncs []chromedp.Action) []error {
+	targetNumber := len(targets)
+	errChan := make(chan error, targetNumber)
+	var wg sync.WaitGroup
+
+	for i := 0; i < targetNumber; i++ {
+		wg.Add(1)
+		go load(ctxt, &wg, errChan, targets[i], loadFuncs[i])
+	}
+	// wait for to finish
+	wg.Wait()
+
+	var errs []error
+loop:
+	for {
+		select {
+		case err := <-errChan:
+			errs = append(errs, err)
+		default:
+			break loop
+		}
+	}
+	return errs
+}
+
+func ClosePool(cancel context.CancelFunc, pool *chromedp.Pool) {
+	defer cancel()
+	// shutdown pool
+	err := pool.Shutdown()
+	if err != nil {
 		log.Panic(err)
 	}
-	cdpInfo.Cancel()
 }
