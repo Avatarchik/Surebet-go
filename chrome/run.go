@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"errors"
 )
 
 type RunReply struct {
@@ -47,22 +48,27 @@ func RunPool(targetNumber int, address string) (RunReply, error) {
 	return RunReply{ctxt, pool, cancel, targets}, nil
 }
 
-func load(ctxt context.Context, wg *sync.WaitGroup, errChan chan error, target *chromedp.Res, loadFunc chromedp.Action) {
+func load(ctxt context.Context, wg *sync.WaitGroup, errChan chan error, target *chromedp.Res, action chromedp.Action) {
 	defer wg.Done()
 
-	if err := target.Run(ctxt, loadFunc); err != nil {
+	if err := target.Run(ctxt, action); err != nil {
 		errChan <- err
 	}
 }
 
-func ExecActions(ctxt context.Context, targets []*chromedp.Res, loadFuncs []chromedp.Action) []error {
+func ExecActions(ctxt context.Context, targets []*chromedp.Res, actions []chromedp.Action) []error {
 	targetNumber := len(targets)
+
+	if targetNumber != len(actions) {
+		return []error{errors.New("numbers of actions and targets are not equal")}
+	}
+
 	errChan := make(chan error, targetNumber)
 	var wg sync.WaitGroup
 
 	for i := 0; i < targetNumber; i++ {
 		wg.Add(1)
-		go load(ctxt, &wg, errChan, targets[i], loadFuncs[i])
+		go load(ctxt, &wg, errChan, targets[i], actions[i])
 	}
 	// wait for to finish
 	wg.Wait()

@@ -9,7 +9,7 @@ import (
 
 func main() {
 	address := "0.0.0.0"
-	targetNumber := 5
+	targetNumber := 10
 
 	runReply, err := chrome.RunPool(targetNumber, address)
 	if err != nil {
@@ -25,6 +25,12 @@ func main() {
 		fonbet.InitLoad(),
 		fonbet.InitLoad(),
 		fonbet.InitLoad(),
+
+		fonbet.InitLoad(),
+		fonbet.InitLoad(),
+		fonbet.InitLoad(),
+		fonbet.InitLoad(),
+		fonbet.InitLoad(),
 	}); len(errs) != 0 {
 		for _, err := range errs {
 			log.Println(err)
@@ -32,13 +38,18 @@ func main() {
 		log.Panic("Goroutine error: InitLoad")
 	}
 
-	var html1, html2, html3, html4, html5 string
+	html := make([]string, targetNumber)
 	if errs := chrome.ExecActions(ctxt, targets, []chromedp.Action{
-		chrome.GetHtml(&html1),
-		chrome.GetHtml(&html2),
-		chrome.GetHtml(&html3),
-		chrome.GetHtml(&html4),
-		chrome.GetHtml(&html5),
+		chrome.GetHtml(&html[0]),
+		chrome.GetHtml(&html[1]),
+		chrome.GetHtml(&html[2]),
+		chrome.GetHtml(&html[3]),
+		chrome.GetHtml(&html[4]),
+		chrome.GetHtml(&html[5]),
+		chrome.GetHtml(&html[6]),
+		chrome.GetHtml(&html[7]),
+		chrome.GetHtml(&html[8]),
+		chrome.GetHtml(&html[9]),
 	}); len(errs) != 0 {
 		for _, err := range errs {
 			log.Println(err)
