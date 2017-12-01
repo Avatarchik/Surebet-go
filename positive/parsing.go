@@ -32,7 +32,7 @@ func ParseHtml(html string, collectedPairs *[]EventPair) error {
 	for _, trNode := range trNodes {
 		var eventPair EventPair
 
-		bookmakers, err := trNode.Search(`.//td[3]/div`)
+		bookmakers, err := trNode.Search(`.//td[3]/a`)
 		if err != nil {
 			return err
 		}
@@ -50,7 +50,7 @@ func ParseHtml(html string, collectedPairs *[]EventPair) error {
 			}
 		}
 
-		matchEvents, err := trNode.Search(`.//td[4]/div`)
+		matchEvents, err := trNode.Search(`.//td[4]/a[@target="_blank"]`)
 		if err != nil {
 			return err
 		}
