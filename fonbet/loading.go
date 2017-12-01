@@ -7,13 +7,21 @@ import (
 	"log"
 )
 
-var url = "https://www.fonbet104.com/live/"
+var Url = "https://www.fonbet104.com/live/"
+var MainNode = `#lineTable > tbody`
+
 var expand = "#lineTableHeaderButton"
-var expandAll = "#lineHeaderViewActionMenu > div:nth-child(6)"
+var expandAll = "#lineHeaderViewActionMenu > .popupMenuItem:nth-child(6)"
+
+var openNodesJs = `nodes = document.querySelectorAll('.detailArrowClose')
+for (cur_node = 0; cur_node < nodes.length; cur_node++) {
+    nodes[cur_node].click()
+}
+document.querySelectorAll('.detailArrowClose').length`
 
 func InitLoad() chromedp.Tasks {
 	return chromedp.Tasks{
-		chromedp.Navigate(url),
+		chromedp.Navigate(Url),
 		chromedp.WaitReady(expand),
 		chromedp.Click(expand),
 		chromedp.WaitReady(expandAll),
@@ -23,5 +31,12 @@ func InitLoad() chromedp.Tasks {
 			log.Println("Fonbet loaded")
 			return nil
 		}),
+	}
+}
+
+func ClickBtnMore() chromedp.Tasks {
+	var res []byte
+	return chromedp.Tasks{
+		chromedp.Evaluate(openNodesJs, &res),
 	}
 }

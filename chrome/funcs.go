@@ -32,3 +32,11 @@ func GetHtml(html *string) chromedp.ActionFunc {
 		return nil
 	}
 }
+
+func GetNodeHtml(sel interface{}, html *string) chromedp.ActionFunc {
+	return func(ctxt context.Context, c cdp.Handler) error {
+		chromedp.OuterHTML(sel, html).Do(ctxt, c)
+		log.Printf("Html size: %d", len(*html))
+		return nil
+	}
+}
