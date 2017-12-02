@@ -5,15 +5,12 @@ import (
 	"github.com/knq/chromedp/cdp"
 	"context"
 	"log"
+	"surebetSearch/common"
 )
-
-type account struct {
-	login, password string
-}
 
 var loginUrl = "https://positivebet.com/en/user/login"
 
-var accounts = []account{
+var Accounts = []common.Account{
 	{"volosha123@gmail.com", "1q1w1e1r"},
 	{"kokozhina@gmail.com", "1q1w1e1r"},
 	{"marshytv@ya.ru", "1q1w1e1r"},
@@ -37,8 +34,8 @@ func InitLoad(targetNumber int) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(loginUrl),
 		chromedp.WaitVisible(loginSel),
-		chromedp.SendKeys(loginSel, accounts[targetNumber].login),
-		chromedp.SendKeys(passSel, accounts[targetNumber].password),
+		chromedp.SendKeys(loginSel, Accounts[targetNumber].Login),
+		chromedp.SendKeys(passSel, Accounts[targetNumber].Password),
 		chromedp.Click(loginBtn),
 		chromedp.WaitNotPresent(loginBtn),
 		chromedp.Click(liveBtn),
@@ -46,7 +43,7 @@ func InitLoad(targetNumber int) chromedp.Tasks {
 		chromedp.Click(autoReloadBtn),
 		chromedp.Evaluate(changeAmountBar, &res),
 		chromedp.ActionFunc(func(ctxt context.Context, h cdp.Handler) error {
-			log.Printf("Positive loaded: %s", accounts[targetNumber].login)
+			log.Printf("Positive loaded: %s", Accounts[targetNumber].Login)
 			return nil
 		}),
 	}

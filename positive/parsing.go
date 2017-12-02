@@ -1,24 +1,12 @@
 package positive
 
-
 import (
 	"github.com/jbowtie/gokogiri"
 	"strings"
+	"surebetSearch/common"
 )
 
-type MatchEvent struct {
-	BookMaker string `json:"BookMaker"`
-	FirstTeam string `json:"FirstTeam"`
-	SecondTeam string `json:"SecondTeam"`
-}
-
-type EventPair struct {
-	FirstEvent MatchEvent `json:"FirstEvent"`
-	SecondEvent MatchEvent `json:"SecondEvent"`
-}
-
-
-func ParseHtml(html string, collectedPairs *[]EventPair) error {
+func ParseHtml(html string, collectedPairs *[]common.EventPair) error {
 	doc, err := gokogiri.ParseHtml([]byte(html))
 	if err != nil {
 		return err
@@ -30,7 +18,7 @@ func ParseHtml(html string, collectedPairs *[]EventPair) error {
 	}
 
 	for _, trNode := range trNodes {
-		var eventPair EventPair
+		var eventPair common.EventPair
 
 		bookmakers, err := trNode.Search(`.//td[3]/a`)
 		if err != nil {
@@ -76,12 +64,12 @@ func ParseHtml(html string, collectedPairs *[]EventPair) error {
 	return nil
 }
 
-func uniq(list []EventPair) []EventPair {
-	unique_set := make(map[EventPair]bool, len(list))
+func uniq(list []common.EventPair) []common.EventPair {
+	unique_set := make(map[common.EventPair]bool, len(list))
 	for _, x := range list {
 		unique_set[x] = true
 	}
-	result := make([]EventPair, 0, len(unique_set))
+	result := make([]common.EventPair, 0, len(unique_set))
 	for x := range unique_set {
 		result = append(result, x)
 	}

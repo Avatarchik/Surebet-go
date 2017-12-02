@@ -1,4 +1,4 @@
-package positive
+package dataBase
 
 import (
 	"github.com/knq/chromedp"
@@ -9,14 +9,15 @@ import (
 	"surebetSearch/chrome"
 	"surebetSearch/common"
 	"fmt"
+	"surebetSearch/positive"
 )
 
-var filename = os.ExpandEnv("$GOPATH/src/surebetSearch/positive/collectedPairs")
+var filename = os.ExpandEnv("$GOPATH/src/surebetSearch/dataBase/collectedPairs")
 
 func collect() error {
-	targetNumber := len(accounts)
+	positiveTargets := len(positive.Accounts)
 
-	runReply, err := chrome.RunPool(targetNumber, "0.0.0.0")
+	runReply, err := chrome.RunPool(positiveTargets, "0.0.0.0")
 	if err != nil {
 		return err
 	}
@@ -25,8 +26,8 @@ func collect() error {
 	targets := runReply.Targets
 
 	var initLoads []chromedp.Action
-	for curTarget := 0; curTarget < targetNumber; curTarget++ {
-		initLoads = append(initLoads, InitLoad(curTarget))
+	for curTarget := 0; curTarget < positiveTargets; curTarget++ {
+		initLoads = append(initLoads, positive.InitLoad(curTarget))
 	}
 
 	if errs := chrome.ExecActions(ctxt, targets, initLoads); len(errs) != 0 {
@@ -35,16 +36,16 @@ func collect() error {
 		}
 	}
 
-	var collectedPairs []EventPair
+	var collectedPairs []common.EventPair
 	common.LoadJson(filename, &collectedPairs)
 
 	prevBackup := len(collectedPairs)
 	for {
 		if err := func() error {
-			html := make([]string, targetNumber)
+			html := make([]string, positiveTargets)
 			var getHtmlAll []chromedp.Action
-			for curTarget := range initLoads {
-				getHtmlAll = append(getHtmlAll, chrome.GetNodeHtml(MainNode, &html[curTarget]))
+			for curTarget := 0; curTarget < positiveTargets; curTarget++ {
+				getHtmlAll = append(getHtmlAll, chrome.GetNodeHtml(positive.MainNode, &html[curTarget]))
 			}
 
 			if errs := chrome.ExecActions(ctxt, targets, getHtmlAll); len(errs) != 0 {
@@ -54,7 +55,7 @@ func collect() error {
 			}
 
 			prevCollected := len(collectedPairs)
-			for curTarget := range initLoads {
+			for curTarget := 0; curTarget < positiveTargets; curTarget++ {
 				if len(html[curTarget]) == 0 {
 					urlName := fmt.Sprintf("https://positivebet%d.com", curTarget)
 					if errs := chrome.ExecActions(ctxt, targets, []chromedp.Action{
@@ -72,7 +73,7 @@ func collect() error {
 					return errors.New("got html with 0 length")
 				}
 
-				if err := ParseHtml(html[curTarget], &collectedPairs); err != nil {
+				if err := positive.ParseHtml(html[curTarget], &collectedPairs); err != nil {
 					return err
 				}
 				log.Printf("Target# %d: %d", curTarget, len(collectedPairs)-prevCollected)
@@ -94,7 +95,7 @@ func collect() error {
 	return nil
 }
 
-func savePairs(collectedPairs *[]EventPair, prevBackup *int) {
+func savePairs(collectedPairs *[]common.EventPair, prevBackup *int) {
 	if len(*collectedPairs) - *prevBackup > 100 {
 		common.SaveJson(filename+".bkp", *collectedPairs)
 		*prevBackup = len(*collectedPairs)
