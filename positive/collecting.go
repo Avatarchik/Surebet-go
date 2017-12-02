@@ -13,8 +13,9 @@ import (
 
 var filename = os.ExpandEnv("$GOPATH/src/surebetSearch/positive/collectedPairs")
 
-func Collect() error {
-	targetNumber := 6
+func collect() error {
+	startTarget := 6
+	targetNumber := 1
 
 	runReply, err := chrome.RunPool(targetNumber, "0.0.0.0")
 	if err != nil {
@@ -25,7 +26,7 @@ func Collect() error {
 	targets := runReply.Targets
 
 	var initLoads []chromedp.Action
-	for curTarget := 0; curTarget < targetNumber; curTarget++ {
+	for curTarget := startTarget; curTarget < startTarget+targetNumber; curTarget++ {
 		initLoads = append(initLoads, InitLoad(curTarget))
 	}
 
@@ -43,7 +44,7 @@ func Collect() error {
 		if err := func() error {
 			html := make([]string, targetNumber)
 			var getHtmlAll []chromedp.Action
-			for curTarget := 0; curTarget < targetNumber; curTarget++ {
+			for curTarget := range initLoads {
 				getHtmlAll = append(getHtmlAll, chrome.GetNodeHtml(MainNode, &html[curTarget]))
 			}
 
@@ -54,7 +55,7 @@ func Collect() error {
 			}
 
 			prevCollected := len(collectedPairs)
-			for curTarget := 0; curTarget < targetNumber; curTarget++ {
+			for curTarget := range initLoads {
 				if len(html[curTarget]) == 0 {
 					urlName := fmt.Sprintf("https://positivebet%d.com", curTarget)
 					if errs := chrome.ExecActions(ctxt, targets, []chromedp.Action{
@@ -102,4 +103,13 @@ func savePairs(collectedPairs *[]EventPair, prevBackup *int) {
 	}
 
 	common.SaveJson(filename, *collectedPairs)
+}
+
+func Collect() {
+	for {
+		if err := collect(); err != nil {
+			log.Println(err)
+		}
+		time.Sleep(7 * time.Second)
+	}
 }

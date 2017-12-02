@@ -39,3 +39,22 @@ func ExpandEvents() chromedp.Tasks {
 		chromedp.Evaluate(openNodesJs, &res),
 	}
 }
+
+var expandAllJs = `document.querySelector('#lineTableHeaderButton').click();
+document.querySelector('#lineHeaderViewActionMenu > div:nth-child(6)').click();`
+
+func ExpandAllJs() chromedp.Tasks {
+	var res []byte
+	return chromedp.Tasks{
+		chromedp.Evaluate(expandAllJs, &res),
+	}
+}
+
+func ExpandAllCdp() chromedp.Tasks {
+	return chromedp.Tasks{
+		chromedp.Click(expand),
+		chromedp.WaitReady(expandAll),
+		chromedp.Click(expandAll),
+		chromedp.WaitNotVisible(expandAll),
+	}
+}
