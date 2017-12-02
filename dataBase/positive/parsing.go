@@ -3,10 +3,10 @@ package positive
 import (
 	"github.com/jbowtie/gokogiri"
 	"strings"
-	"surebetSearch/common"
+	"surebetSearch/dataBase/types"
 )
 
-func ParseHtml(html string, collectedPairs *[]common.EventPair) error {
+func ParseHtml(html string, collectedPairs *[]types.EventPair) error {
 	doc, err := gokogiri.ParseHtml([]byte(html))
 	if err != nil {
 		return err
@@ -18,7 +18,7 @@ func ParseHtml(html string, collectedPairs *[]common.EventPair) error {
 	}
 
 	for _, trNode := range trNodes {
-		var eventPair common.EventPair
+		var eventPair types.EventPair
 
 		bookmakers, err := trNode.Search(`.//td[3]/a`)
 		if err != nil {
@@ -64,12 +64,12 @@ func ParseHtml(html string, collectedPairs *[]common.EventPair) error {
 	return nil
 }
 
-func uniq(list []common.EventPair) []common.EventPair {
-	unique_set := make(map[common.EventPair]bool, len(list))
+func uniq(list []types.EventPair) []types.EventPair {
+	unique_set := make(map[types.EventPair]bool, len(list))
 	for _, x := range list {
 		unique_set[x] = true
 	}
-	result := make([]common.EventPair, 0, len(unique_set))
+	result := make([]types.EventPair, 0, len(unique_set))
 	for x := range unique_set {
 		result = append(result, x)
 	}

@@ -6,10 +6,11 @@ import (
 	"time"
 	"os"
 	"errors"
+	"fmt"
 	"surebetSearch/chrome"
 	"surebetSearch/common"
-	"fmt"
-	"surebetSearch/positive"
+	"surebetSearch/dataBase/positive"
+	"surebetSearch/dataBase/types"
 )
 
 var filename = os.ExpandEnv("$GOPATH/src/surebetSearch/dataBase/collectedPairs")
@@ -36,7 +37,7 @@ func collect() error {
 		}
 	}
 
-	var collectedPairs []common.EventPair
+	var collectedPairs []types.EventPair
 	common.LoadJson(filename, &collectedPairs)
 
 	prevBackup := len(collectedPairs)
@@ -95,7 +96,7 @@ func collect() error {
 	return nil
 }
 
-func savePairs(collectedPairs *[]common.EventPair, prevBackup *int) {
+func savePairs(collectedPairs *[]types.EventPair, prevBackup *int) {
 	if len(*collectedPairs) - *prevBackup > 100 {
 		common.SaveJson(filename+".bkp", *collectedPairs)
 		*prevBackup = len(*collectedPairs)

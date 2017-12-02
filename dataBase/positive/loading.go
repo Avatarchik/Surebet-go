@@ -5,12 +5,12 @@ import (
 	"github.com/knq/chromedp/cdp"
 	"context"
 	"log"
-	"surebetSearch/common"
+	"surebetSearch/dataBase/types"
 )
 
 var loginUrl = "https://positivebet.com/en/user/login"
 
-var Accounts = []common.Account{
+var Accounts = []types.Account{
 	{"volosha123@gmail.com", "1q1w1e1r"},
 	{"kokozhina@gmail.com", "1q1w1e1r"},
 	{"marshytv@ya.ru", "1q1w1e1r"},

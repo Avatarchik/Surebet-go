@@ -1,4 +1,4 @@
-package common
+package types
 
 type MatchEvent struct {
 	BookMaker  string `json:"BookMaker"`
