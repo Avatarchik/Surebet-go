@@ -14,19 +14,18 @@ import (
 var filename = os.ExpandEnv("$GOPATH/src/surebetSearch/positive/collectedPairs")
 
 func collect() error {
-	startTarget := 6
-	targetNumber := 1
+	targetNumber := len(accounts)
 
 	runReply, err := chrome.RunPool(targetNumber, "0.0.0.0")
 	if err != nil {
 		return err
 	}
-	defer chrome.ClosePool(runReply.Cancel, runReply.Pool)
+	defer chrome.ClosePool(runReply.Cancel, runReply.Targets, runReply.Pool)
 	ctxt := runReply.Ctxt
 	targets := runReply.Targets
 
 	var initLoads []chromedp.Action
-	for curTarget := startTarget; curTarget < startTarget+targetNumber; curTarget++ {
+	for curTarget := 0; curTarget < targetNumber; curTarget++ {
 		initLoads = append(initLoads, InitLoad(curTarget))
 	}
 
@@ -110,6 +109,6 @@ func Collect() {
 		if err := collect(); err != nil {
 			log.Println(err)
 		}
-		time.Sleep(7 * time.Second)
+		time.Sleep(5 * time.Second)
 	}
 }

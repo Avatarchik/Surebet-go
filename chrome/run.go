@@ -86,8 +86,12 @@ loop:
 	return errs
 }
 
-func ClosePool(cancel context.CancelFunc, pool *chromedp.Pool) {
+func ClosePool(cancel context.CancelFunc, targets []*chromedp.Res, pool *chromedp.Pool) {
 	defer cancel()
+	//release resources
+	for _, target := range targets {
+		target.Release()
+	}
 	// shutdown pool
 	err := pool.Shutdown()
 	if err != nil {
