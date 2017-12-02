@@ -19,8 +19,10 @@ var loginBtn = `#login-form > div.form-actions > button`
 var liveBtn = `#yw0 > li:nth-child(2) > a`
 var MainNode = `.grid-view > table`
 var autoReloadBtn = `#formPanel > #btnAutoRefresh`
+var changeAmountBar = `document.querySelector('#ddlPerPage').value = 30`
 
 func InitLoad() chromedp.Tasks {
+	var res []byte
 	return chromedp.Tasks{
 		chromedp.Navigate(loginUrl),
 		chromedp.WaitVisible(loginSel),
@@ -31,6 +33,7 @@ func InitLoad() chromedp.Tasks {
 		chromedp.Click(liveBtn),
 		chromedp.WaitVisible(MainNode),
 		chromedp.Click(autoReloadBtn),
+		chromedp.Evaluate(changeAmountBar, &res),
 		chromedp.ActionFunc(func(ctxt context.Context, h cdp.Handler) error {
 			log.Println("Loaded positive")
 			return nil
