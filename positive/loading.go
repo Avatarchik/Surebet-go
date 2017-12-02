@@ -9,7 +9,14 @@ import (
 
 var loginUrl = "https://positivebet.com/en/user/login"
 
-var login = "lester0578@gmail.com"
+var login = []string{
+	"volosha123@gmail.com",
+	"kokozhina@gmail.com",
+	"marshytv@ya.ru",
+	"ilya00@gmail.com",
+	"kolyan312@gmail.com",
+	"petya146@gmail.com",
+}
 var pass = "1q1w1e1r"
 
 var loginSel = `#UserLogin_username`
@@ -21,12 +28,12 @@ var MainNode = `.grid-view > table`
 var autoReloadBtn = `#formPanel > #btnAutoRefresh`
 var changeAmountBar = `document.querySelector('#ddlPerPage').value = 30`
 
-func InitLoad() chromedp.Tasks {
+func InitLoad(targetNumber int) chromedp.Tasks {
 	var res []byte
 	return chromedp.Tasks{
 		chromedp.Navigate(loginUrl),
 		chromedp.WaitVisible(loginSel),
-		chromedp.SendKeys(loginSel, login),
+		chromedp.SendKeys(loginSel, login[targetNumber]),
 		chromedp.SendKeys(passSel, pass),
 		chromedp.Click(loginBtn),
 		chromedp.WaitNotPresent(loginBtn),
@@ -35,7 +42,7 @@ func InitLoad() chromedp.Tasks {
 		chromedp.Click(autoReloadBtn),
 		chromedp.Evaluate(changeAmountBar, &res),
 		chromedp.ActionFunc(func(ctxt context.Context, h cdp.Handler) error {
-			log.Println("Loaded positive")
+			log.Printf("Loaded positive# %d", targetNumber)
 			return nil
 		}),
 	}
