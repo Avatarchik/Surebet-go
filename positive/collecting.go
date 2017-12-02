@@ -3,15 +3,14 @@ package positive
 import (
 	"github.com/knq/chromedp"
 	"surebetSearch/chrome"
-	"io/ioutil"
-	"encoding/json"
 	"log"
 	"time"
 	"os"
+	"errors"
+	"surebetSearch/common"
 )
 
-var filename = os.ExpandEnv("$GOPATH/src/surebetSearch/positive/collectedPairs.json")
-
+var filename = os.ExpandEnv("$GOPATH/src/surebetSearch/positive/collectedPairs")
 
 func Collect() error {
 	runReply, err := chrome.RunPool(1, "0.0.0.0")
@@ -30,19 +29,13 @@ func Collect() error {
 		}
 	}
 
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return err
-	}
-
 	var collectedPairs []EventPair
-	err = json.Unmarshal(data, &collectedPairs)
-	if err != nil {
-		return err
-	}
+	common.LoadJson(filename, &collectedPairs)
+
+	prevAmount := len(collectedPairs)
 
 	for {
-		if err := func() error{
+		if err := func() error {
 			var html string
 			if errs := chrome.ExecActions(ctxt, targets, []chromedp.Action{
 				chrome.GetNodeHtml(MainNode, &html),
@@ -52,15 +45,25 @@ func Collect() error {
 				}
 			}
 
+			if len(html) == 0 {
+				if errs := chrome.ExecActions(ctxt, targets, []chromedp.Action{
+					chromedp.Tasks{chrome.SaveScn(loginUrl),
+						chrome.WrapFunc(func() error {
+							return common.SaveHtml(loginUrl, html)
+						})},
+				}); len(errs) != 0 {
+					for _, err := range errs {
+						return err
+					}
+				}
+				return errors.New("got html with 0 length")
+			}
+
 			if err := ParseHtml(html, &collectedPairs); err != nil {
 				return err
 			}
 
-			data, err = json.Marshal(collectedPairs)
-			if err != nil {
-				return err
-			}
-			defer saveJson(data)
+			defer savePairs(&collectedPairs, &prevAmount)
 
 			return nil
 		}(); err != nil {
@@ -72,12 +75,15 @@ func Collect() error {
 		time.Sleep(2 * time.Second)
 	}
 
-
 	return nil
 }
 
-func saveJson(data []byte) {
-	if err := ioutil.WriteFile(filename, data, 0644); err != nil {
-		log.Panic(err)
+func savePairs(collectedPairs *[]EventPair, prevAmount *int) {
+	if len(*collectedPairs) - *prevAmount > 100 {
+		common.SaveJson(filename+".bkp", *collectedPairs)
+		*prevAmount = len(*collectedPairs)
+		log.Println("Backup saved")
 	}
+
+	common.SaveJson(filename, *collectedPairs)
 }
