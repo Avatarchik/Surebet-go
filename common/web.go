@@ -10,5 +10,10 @@ func GetSiteName(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return strings.Split(u.Hostname(), ".")[1], nil
+	parts := strings.Split(u.Hostname(), ".")
+	siteName := parts[0]
+	if parts[0] == "www" {
+		siteName = parts[1]
+	}
+	return siteName, nil
 }
