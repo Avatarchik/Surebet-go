@@ -41,7 +41,7 @@ func GetNodeHtml(sel interface{}, html *string) chromedp.ActionFunc {
 	}
 }
 
-func wrapFunc(fn func() error) chromedp.ActionFunc {
+func WrapFunc(fn func() error) chromedp.ActionFunc {
 	return func(ctxt context.Context, c cdp.Handler) error {
 		return fn()
 	}
