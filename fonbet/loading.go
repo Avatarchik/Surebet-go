@@ -13,11 +13,10 @@ var MainNode = `#lineTable > tbody`
 var expand = "#lineTableHeaderButton"
 var expandAll = "#lineHeaderViewActionMenu > .popupMenuItem:nth-child(6)"
 
-var openNodesJs = `nodes = document.querySelectorAll('.detailArrowClose')
+var openNodesJs = `nodes = document.querySelectorAll('span[style="display: inline-block;"].detailArrowClose')
 for (cur_node = 0; cur_node < nodes.length; cur_node++) {
     nodes[cur_node].click()
-}
-document.querySelectorAll('.detailArrowClose').length`
+}`
 
 func InitLoad() chromedp.Tasks {
 	return chromedp.Tasks{
@@ -34,7 +33,7 @@ func InitLoad() chromedp.Tasks {
 	}
 }
 
-func ClickBtnMore() chromedp.Tasks {
+func ExpandEvents() chromedp.Tasks {
 	var res []byte
 	return chromedp.Tasks{
 		chromedp.Evaluate(openNodesJs, &res),
