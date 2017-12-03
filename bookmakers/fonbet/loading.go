@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var LoadTimeout = 10 * time.Second
+var LoadTimeout = 15 * time.Second
 var ExpandTimeout = 5 * time.Second
 var HtmlTimeout = 3 * time.Second
 

@@ -102,9 +102,7 @@ func ReloadTarget(number int, initLoad chromedp.Action, url string) error {
 		return err
 	}
 
-	if err := targets[number].Release(); err != nil {
-		return err
-	}
+	targets[number].Release() //Do not handle error
 
 	var err error
 	targets[number], err = pool.Allocate(ctx, options...)
