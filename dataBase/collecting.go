@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 	"os"
-	"fmt"
 	"surebetSearch/chrome"
 	"surebetSearch/common"
 	"surebetSearch/dataBase/positive"
@@ -43,15 +42,20 @@ func collect() error {
 		}
 
 		if errs := chrome.ExecActions(positive.HtmlTimeout, getHtmlAll); len(errs) != 0 {
-			return &chrome.GoroutineError{errs, positive.LoginUrl, "getHtml"}
+			log.Println(&chrome.GoroutineError{errs, positive.LoginUrl, "getHtml"})
+			for curTarget, err := range errs {
+				if err != nil {
+					if err := positive.ReloadTarget(curTarget); err != nil {
+						return err
+					}
+				}
+			}
 		}
 
 		prevCollected := len(collectedPairs)
 		for curTarget := 0; curTarget < positiveTargets; curTarget++ {
 			if len(html[curTarget]) == 0 {
-				log.Println("Got html with 0 length")
-				url := fmt.Sprintf("https://positivebet%d.com", curTarget)
-				if err := chrome.ReloadTarget(curTarget, positive.InitLoad(curTarget), url); err != nil {
+				if err := positive.ReloadTarget(curTarget); err != nil {
 					return err
 				}
 			}

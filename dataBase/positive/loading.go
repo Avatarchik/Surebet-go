@@ -7,10 +7,12 @@ import (
 	"log"
 	"surebetSearch/dataBase/types"
 	"time"
+	"fmt"
+	"surebetSearch/chrome"
 )
 
 var LoadTimeout = 60 * time.Second
-var HtmlTimeout = 15 * time.Second
+var HtmlTimeout = 30 * time.Second
 
 var LoginUrl = "https://positivebet.com/en/user/login"
 
@@ -51,4 +53,12 @@ func InitLoad(targetNumber int) chromedp.Tasks {
 			return nil
 		}),
 	}
+}
+
+func ReloadTarget(number int) error {
+	url := fmt.Sprintf("https://positivebet%d.com", number)
+	if err := chrome.ReloadTarget(number, InitLoad(number), url); err != nil {
+		return err
+	}
+	return nil
 }

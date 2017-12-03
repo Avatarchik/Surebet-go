@@ -90,6 +90,8 @@ loop:
 }
 
 func ReloadTarget(number int, initLoad chromedp.Action, url string) error {
+	log.Printf("Reloading target# %d: %s", number, url)
+
 	var html string
 	if err := targets[number].Run(ctx, chromedp.Tasks{
 		GetHtml(&html),
