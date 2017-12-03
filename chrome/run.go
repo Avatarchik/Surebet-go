@@ -8,55 +8,56 @@ import (
 	"log"
 	"sync"
 	"errors"
+	"time"
+	"surebetSearch/common"
 )
 
-type RunReply struct {
-	Ctxt    context.Context
-	Pool    *chromedp.Pool
-	Cancel  context.CancelFunc
-	Targets []*chromedp.Res
+var ctx context.Context
+var pool *chromedp.Pool
+var cancel context.CancelFunc
+var targets []*chromedp.Res
+
+var options = []runner.CommandLineOption{
+	runner.ExecPath("/usr/bin/google-chrome"),
+	runner.Flag("headless", true),
+	runner.Flag("disable-gpu", true),
+	runner.Flag("no-first-run", true),
+	runner.Flag("no-default-browser-check", true),
 }
 
-func RunPool(targetNumber int, address string) (RunReply, error) {
-	var options = []runner.CommandLineOption{
-		runner.ExecPath("/usr/bin/google-chrome"),
-		runner.Flag("headless", true),
-		runner.Flag("disable-gpu", true),
-		runner.Flag("remote-debugging-address", address),
-		runner.Flag("no-first-run", true),
-		runner.Flag("no-default-browser-check", true),
-	}
-
-	ctxt, cancel := context.WithCancel(context.Background())
-
+func RunPool(targetNumber int, address string) error {
+	var err error
+	options = append(options, runner.Flag("remote-debugging-address", address))
 	startPort := 9222
+
+	ctx, cancel = context.WithCancel(context.Background())
+
 	// create pool
-	pool, err := chromedp.NewPool(chromedp.PortRange(startPort, startPort+targetNumber))
+	pool, err = chromedp.NewPool(chromedp.PortRange(startPort, startPort+targetNumber))
 	if err != nil {
-		return RunReply{}, err
+		return err
 	}
 
-	targets := make([]*chromedp.Res, targetNumber)
+	targets = make([]*chromedp.Res, targetNumber)
 	for i := 0; i < targetNumber; i++ {
 		// allocate
-		targets[i], err = pool.Allocate(ctxt, options...)
+		targets[i], err = pool.Allocate(ctx, options...)
 		if err != nil {
-			return RunReply{}, fmt.Errorf("instance# %d error: %v", i, err)
+			return fmt.Errorf("instance# %d error: %v", i, err)
 		}
 	}
-
-	return RunReply{ctxt, pool, cancel, targets}, nil
+	return nil
 }
 
-func load(ctxt context.Context, wg *sync.WaitGroup, errChan chan error, target *chromedp.Res, action chromedp.Action) {
+func load(ctx context.Context, wg *sync.WaitGroup, errChan chan error, target *chromedp.Res, action chromedp.Action) {
 	defer wg.Done()
 
-	if err := target.Run(ctxt, action); err != nil {
+	if err := target.Run(ctx, action); err != nil {
 		errChan <- err
 	}
 }
 
-func ExecActions(ctxt context.Context, targets []*chromedp.Res, actions []chromedp.Action) []error {
+func ExecActions(timeout time.Duration, actions []chromedp.Action) []error {
 	targetNumber := len(targets)
 
 	if targetNumber != len(actions) {
@@ -67,8 +68,10 @@ func ExecActions(ctxt context.Context, targets []*chromedp.Res, actions []chrome
 	var wg sync.WaitGroup
 
 	for i := 0; i < targetNumber; i++ {
+		ctx, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel() // releases resources if slow operation completes before timeout elapses
 		wg.Add(1)
-		go load(ctxt, &wg, errChan, targets[i], actions[i])
+		go load(ctx, &wg, errChan, targets[i], actions[i])
 	}
 	// wait for to finish
 	wg.Wait()
@@ -86,7 +89,36 @@ loop:
 	return errs
 }
 
-func ClosePool(cancel context.CancelFunc, targets []*chromedp.Res, pool *chromedp.Pool) {
+func ReloadTarget(number int, initLoad chromedp.Action, url string) error {
+	var html string
+	if err := targets[number].Run(ctx, chromedp.Tasks{
+		GetHtml(&html),
+		SaveScn(url),
+	}); err != nil {
+		return err
+	}
+
+	if err := common.SaveHtml(url, html); err != nil {
+		return err
+	}
+
+	if err := targets[number].Release(); err != nil {
+		return err
+	}
+
+	var err error
+	targets[number], err = pool.Allocate(ctx, options...)
+	if err != nil {
+		return fmt.Errorf("reallocate target# %d error: %v", number, err)
+	}
+
+	if err := targets[number].Run(ctx, initLoad); err != nil {
+		return err
+	}
+	return nil
+}
+
+func ClosePool() {
 	defer cancel()
 	//release resources
 	for _, target := range targets {

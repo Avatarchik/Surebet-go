@@ -6,9 +6,13 @@ import (
 	"context"
 	"log"
 	"surebetSearch/dataBase/types"
+	"time"
 )
 
-var loginUrl = "https://positivebet.com/en/user/login"
+var LoadTimeout = 15 * time.Second
+var HtmlTimeout = 3 * time.Second
+
+var LoginUrl = "https://positivebet.com/en/user/login"
 
 var Accounts = []types.Account{
 	{"volosha123@gmail.com", "1q1w1e1r"},
@@ -32,7 +36,7 @@ var changeAmountBar = `document.querySelector('#ddlPerPage').value = 30`
 func InitLoad(targetNumber int) chromedp.Tasks {
 	var res []byte
 	return chromedp.Tasks{
-		chromedp.Navigate(loginUrl),
+		chromedp.Navigate(LoginUrl),
 		chromedp.WaitVisible(loginSel),
 		chromedp.SendKeys(loginSel, Accounts[targetNumber].Login),
 		chromedp.SendKeys(passSel, Accounts[targetNumber].Password),

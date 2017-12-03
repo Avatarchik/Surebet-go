@@ -10,9 +10,9 @@ import (
 )
 
 func SaveScn(url string) chromedp.ActionFunc {
-	return func(ctxt context.Context, c cdp.Handler) error {
+	return func(ctx context.Context, c cdp.Handler) error {
 		var buf []byte
-		chromedp.CaptureScreenshot(&buf).Do(ctxt, c)
+		chromedp.CaptureScreenshot(&buf).Do(ctx, c)
 		siteName, err := common.GetSiteName(url)
 		if err != nil {
 			return err
@@ -26,23 +26,23 @@ func SaveScn(url string) chromedp.ActionFunc {
 }
 
 func GetHtml(html *string) chromedp.ActionFunc {
-	return func(ctxt context.Context, c cdp.Handler) error {
-		chromedp.OuterHTML("html", html).Do(ctxt, c)
+	return func(ctx context.Context, c cdp.Handler) error {
+		chromedp.OuterHTML("html", html).Do(ctx, c)
 		log.Printf("Html size: %d", len(*html))
 		return nil
 	}
 }
 
 func GetNodeHtml(sel interface{}, html *string) chromedp.ActionFunc {
-	return func(ctxt context.Context, c cdp.Handler) error {
-		chromedp.OuterHTML(sel, html).Do(ctxt, c)
+	return func(ctx context.Context, c cdp.Handler) error {
+		chromedp.OuterHTML(sel, html).Do(ctx, c)
 		log.Printf("Html size: %d", len(*html))
 		return nil
 	}
 }
 
 func WrapFunc(fn func() error) chromedp.ActionFunc {
-	return func(ctxt context.Context, c cdp.Handler) error {
+	return func(ctx context.Context, c cdp.Handler) error {
 		return fn()
 	}
 }

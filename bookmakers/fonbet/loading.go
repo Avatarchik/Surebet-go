@@ -5,7 +5,12 @@ import (
 	"github.com/knq/chromedp/cdp"
 	"context"
 	"log"
+	"time"
 )
+
+var LoadTimeout = 10 * time.Second
+var ExpandTimeout = 5 * time.Second
+var HtmlTimeout = 3 * time.Second
 
 var Url = "https://www.fonbet104.com/live/"
 var MainNode = `#lineTable > tbody`
