@@ -49,10 +49,12 @@ func RunPool(targetNumber int, address string) error {
 	return nil
 }
 
-func load(ctx context.Context, wg *sync.WaitGroup, errChan chan error, target *chromedp.Res, action chromedp.Action) {
+func load(timeout time.Duration, wg *sync.WaitGroup, errChan chan error, target *chromedp.Res, action chromedp.Action) {
 	defer wg.Done()
 
-	if err := target.Run(ctx, action); err != nil {
+	ctxTimeout, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel() // releases resources if slow operation completes before timeout elapses
+	if err := target.Run(ctxTimeout, action); err != nil {
 		errChan <- err
 	}
 }
@@ -68,10 +70,8 @@ func ExecActions(timeout time.Duration, actions []chromedp.Action) []error {
 	var wg sync.WaitGroup
 
 	for i := 0; i < targetNumber; i++ {
-		ctx, cancel := context.WithTimeout(ctx, timeout)
-		defer cancel() // releases resources if slow operation completes before timeout elapses
 		wg.Add(1)
-		go load(ctx, &wg, errChan, targets[i], actions[i])
+		go load(timeout, &wg, errChan, targets[i], actions[i])
 	}
 	// wait for to finish
 	wg.Wait()

@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-var LoadTimeout = 15 * time.Second
-var HtmlTimeout = 3 * time.Second
+var LoadTimeout = 40 * time.Second
+var HtmlTimeout = 15 * time.Second
 
 var LoginUrl = "https://positivebet.com/en/user/login"
 
