@@ -2,8 +2,8 @@ package chrome
 
 import (
 	"context"
-	"github.com/knq/chromedp"
-	"github.com/knq/chromedp/runner"
+	"github.com/korovkinand/chromedp"
+	"github.com/korovkinand/chromedp/runner"
 	"fmt"
 	"log"
 	"sync"

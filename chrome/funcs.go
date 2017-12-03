@@ -5,8 +5,8 @@ import (
 	"context"
 	"log"
 	"surebetSearch/common"
-	"github.com/knq/chromedp"
-	"github.com/knq/chromedp/cdp"
+	"github.com/korovkinand/chromedp"
+	"github.com/korovkinand/chromedp/cdp"
 )
 
 func SaveScn(url string) chromedp.ActionFunc {

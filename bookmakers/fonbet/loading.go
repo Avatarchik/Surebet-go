@@ -1,8 +1,8 @@
 package fonbet
 
 import (
-	"github.com/knq/chromedp"
-	"github.com/knq/chromedp/cdp"
+	"github.com/korovkinand/chromedp"
+	"github.com/korovkinand/chromedp/cdp"
 	"context"
 	"log"
 	"time"

@@ -1,7 +1,7 @@
 package dataBase
 
 import (
-	"github.com/knq/chromedp"
+	"github.com/korovkinand/chromedp"
 	"log"
 	"time"
 	"os"
