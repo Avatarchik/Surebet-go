@@ -118,10 +118,6 @@ func ReloadTarget(number int, initLoad chromedp.Action, url string) error {
 
 func ClosePool() {
 	defer cancel()
-	//release resources
-	for _, target := range targets {
-		target.Release()
-	}
 	// shutdown pool
 	err := pool.Shutdown()
 	if err != nil {
