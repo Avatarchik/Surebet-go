@@ -6,15 +6,17 @@ import (
 	"surebetSearch/dataBase/types"
 )
 
-func ParseHtml(html string, collectedPairs *[]types.EventPair) error {
-	doc, err := gokogiri.ParseHtml([]byte(html))
+func ParseHtml(html *string) ([]types.EventPair, error) {
+	var newPairs []types.EventPair
+
+	doc, err := gokogiri.ParseHtml([]byte(*html))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	trNodes, err := doc.Search(`//table/tbody/tr[not(@id = "")]`)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for _, trNode := range trNodes {
@@ -22,13 +24,13 @@ func ParseHtml(html string, collectedPairs *[]types.EventPair) error {
 
 		bookmakers, err := trNode.Search(`.//td[3]/a`)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		for curMaker, bookmaker := range bookmakers {
 			gotText, err := bookmaker.Search(`./text()`)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			if curMaker == 0 {
@@ -40,12 +42,12 @@ func ParseHtml(html string, collectedPairs *[]types.EventPair) error {
 
 		matchEvents, err := trNode.Search(`.//td[4]/a[@target="_blank"]`)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		for curMatch, matchEvent := range matchEvents {
 			gotText, err := matchEvent.Search(`./text()`)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			teams := strings.Split(gotText[0].String(), " vs ")
@@ -56,22 +58,7 @@ func ParseHtml(html string, collectedPairs *[]types.EventPair) error {
 			}
 		}
 
-		*collectedPairs = append(*collectedPairs, eventPair)
+		newPairs = append(newPairs, eventPair)
 	}
-
-	*collectedPairs = uniq(*collectedPairs)
-
-	return nil
-}
-
-func uniq(list []types.EventPair) []types.EventPair {
-	unique_set := make(map[types.EventPair]bool, len(list))
-	for _, x := range list {
-		unique_set[x] = true
-	}
-	result := make([]types.EventPair, 0, len(unique_set))
-	for x := range unique_set {
-		result = append(result, x)
-	}
-	return result
+	return newPairs, nil
 }

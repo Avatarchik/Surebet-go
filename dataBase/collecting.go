@@ -9,6 +9,8 @@ import (
 	"surebetSearch/common"
 	"surebetSearch/dataBase/positive"
 	"surebetSearch/dataBase/types"
+	"errors"
+	"runtime"
 )
 
 var filename = os.ExpandEnv("$GOPATH/src/surebetSearch/dataBase/collectedPairs")
@@ -42,51 +44,43 @@ func collect() error {
 		}
 
 		if errs := chrome.ExecActions(positive.HtmlTimeout, getHtmlAll); len(errs) != 0 {
-			log.Println(&chrome.GoroutineError{errs, positive.LoginUrl, "getHtml"})
-			for curTarget, err := range errs {
-				if err != nil {
-					if err := positive.ReloadTarget(curTarget); err != nil {
-						return err
-					}
-				}
-			}
+			return &chrome.GoroutineError{errs, positive.LoginUrl, "getHtml"}
 		}
 
-		prevCollected := len(collectedPairs)
 		for curTarget := 0; curTarget < positiveTargets; curTarget++ {
 			if len(html[curTarget]) == 0 {
-				if err := positive.ReloadTarget(curTarget); err != nil {
-					return err
-				}
+				return errors.New("got html with 0 length")
 			}
 
-			if err := positive.ParseHtml(html[curTarget], &collectedPairs); err != nil {
+			newPairs, err := positive.ParseHtml(&html[curTarget])
+			if err != nil {
 				return err
 			}
-			log.Printf("Target# %d: %d", curTarget, len(collectedPairs)-prevCollected)
-			prevCollected = len(collectedPairs)
-		}
-		if err := savePairs(&collectedPairs, &prevBackup); err != nil {
-			return err
-		}
 
+			uniques := UniqueAndDiff(&collectedPairs, newPairs)
+			if err := savePairs(collectedPairs, &prevBackup); err != nil {
+				return err
+			}
+			log.Printf("Target# %d: %d", curTarget, uniques)
+		}
 		log.Println(len(collectedPairs))
 		time.Sleep(2 * time.Second)
 	}
 	return nil
 }
 
-func savePairs(collectedPairs *[]types.EventPair, prevBackup *int) error {
-	if len(*collectedPairs) - *prevBackup > 100 {
-		if err := common.SaveJson(filename+".bkp", *collectedPairs); err != nil {
+func savePairs(collectedPairs []types.EventPair, prevBackup *int) error {
+	pairsAmount := len(collectedPairs)
+	if pairsAmount - *prevBackup > 50 {
+		if err := common.SaveJson(filename+".bkp", collectedPairs); err != nil {
 			return err
 		}
-		*prevBackup = len(*collectedPairs)
+		*prevBackup = pairsAmount
 		log.Println("Backup saved")
-	}
-
-	if err := common.SaveJson(filename, *collectedPairs); err != nil {
-		return err
+		// Temp code
+		if err := common.SaveJson(filename, collectedPairs); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -96,6 +90,8 @@ func Collect() {
 		if err := collect(); err != nil {
 			log.Println(err)
 		}
+		//Look at runtime.MemProfile
+		runtime.GC()
 		time.Sleep(5 * time.Second)
 	}
 }
