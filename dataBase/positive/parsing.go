@@ -6,6 +6,7 @@ import (
 	"surebetSearch/dataBase/types"
 )
 
+
 func ParseHtml(html *string) ([]types.EventPair, error) {
 	var newPairs []types.EventPair
 
@@ -13,6 +14,7 @@ func ParseHtml(html *string) ([]types.EventPair, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer doc.Free()
 
 	trNodes, err := doc.Search(`//table/tbody/tr[not(@id = "")]`)
 	if err != nil {
