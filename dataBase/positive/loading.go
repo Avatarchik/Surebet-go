@@ -7,8 +7,6 @@ import (
 	"log"
 	"surebetSearch/dataBase/types"
 	"time"
-	"fmt"
-	"surebetSearch/chrome"
 )
 
 var LoadTimeout = 60 * time.Second
@@ -35,13 +33,13 @@ var MainNode = `.grid-view > table`
 var autoReloadBtn = `#formPanel > #btnAutoRefresh`
 var changeAmountBar = `document.querySelector('#ddlPerPage').value = 30`
 
-func InitLoad(targetNumber int) chromedp.Tasks {
+func InitLoad(account types.Account) chromedp.Tasks {
 	var res []byte
 	return chromedp.Tasks{
 		chromedp.Navigate(LoginUrl),
 		chromedp.WaitVisible(loginSel),
-		chromedp.SendKeys(loginSel, Accounts[targetNumber].Login),
-		chromedp.SendKeys(passSel, Accounts[targetNumber].Password),
+		chromedp.SendKeys(loginSel, account.Login),
+		chromedp.SendKeys(passSel, account.Password),
 		chromedp.Click(loginBtn),
 		chromedp.WaitNotPresent(loginBtn),
 		chromedp.Click(liveBtn),
@@ -49,16 +47,8 @@ func InitLoad(targetNumber int) chromedp.Tasks {
 		chromedp.Click(autoReloadBtn),
 		chromedp.Evaluate(changeAmountBar, &res),
 		chromedp.ActionFunc(func(ctxt context.Context, h cdp.Handler) error {
-			log.Printf("Positive loaded: %s", Accounts[targetNumber].Login)
+			log.Printf("Positive loaded: %s", account.Login)
 			return nil
 		}),
 	}
-}
-
-func ReloadTarget(number int) error {
-	url := fmt.Sprintf("https://positivebet%d.com", number)
-	if err := chrome.ReloadTarget(number, InitLoad(number), url); err != nil {
-		return err
-	}
-	return nil
 }

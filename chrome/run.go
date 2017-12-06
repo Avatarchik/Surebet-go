@@ -9,7 +9,6 @@ import (
 	"sync"
 	"errors"
 	"time"
-	"surebetSearch/common"
 )
 
 var ctx context.Context
@@ -87,35 +86,6 @@ loop:
 		}
 	}
 	return errs
-}
-
-func ReloadTarget(number int, initLoad chromedp.Action, url string) error {
-	log.Printf("Reloading target# %d: %s", number, url)
-
-	var html string
-	if err := targets[number].Run(ctx, chromedp.Tasks{
-		GetHtml(&html),
-		SaveScn(url),
-	}); err != nil {
-		return err
-	}
-
-	if err := common.SaveHtml(url, html); err != nil {
-		return err
-	}
-
-	targets[number].Release() //Do not handle error
-
-	var err error
-	targets[number], err = pool.Allocate(ctx, options...)
-	if err != nil {
-		return fmt.Errorf("reallocate target# %d error: %v", number, err)
-	}
-
-	if err := targets[number].Run(ctx, initLoad); err != nil {
-		return err
-	}
-	return nil
 }
 
 func ClosePool() {

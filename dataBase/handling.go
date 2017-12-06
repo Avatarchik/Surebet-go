@@ -1,25 +1,67 @@
 package dataBase
 
-import "surebetSearch/dataBase/types"
+import (
+	"surebetSearch/dataBase/types"
+	"sync"
+	"io/ioutil"
+	"encoding/json"
+)
 
-func getUnique(collectedPairs, newPairs []types.EventPair) []types.EventPair {
-	var uniquePairs []types.EventPair
+type CollectedPairs struct {
+	v   []types.EventPair
+	mux sync.Mutex
+}
+
+func (c *CollectedPairs) AppendUnique(newPairs []types.EventPair) {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
 loop:
 	for _, newPair := range newPairs {
-		for _, collectedPair := range collectedPairs {
+		for _, collectedPair := range c.v {
 			if collectedPair == newPair {
 				continue loop
 			}
 		}
-		uniquePairs = append(uniquePairs, newPair)
+		c.v = append(c.v, newPair)
 	}
-	return uniquePairs
 }
 
-func UniqueAndDiff(collectedPairs *[]types.EventPair, newPairs []types.EventPair) int {
-	//Check if slice is sorted, then sort if necessary
-	uniquePairs := getUnique(*collectedPairs, newPairs)
-	*collectedPairs = append(*collectedPairs, uniquePairs...)
-	//Sort after appending
-	return len(uniquePairs)
+func (c *CollectedPairs) Length() int {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
+	return len(c.v)
+}
+
+func (c *CollectedPairs) Load(filename string) error {
+	byteData, err := ioutil.ReadFile(filename + ".json")
+	if err != nil {
+		return err
+	}
+
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
+	err = json.Unmarshal(byteData, &(c.v))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *CollectedPairs) Save(filename string) error {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
+	byteData, err := json.Marshal(c.v)
+	if err != nil {
+		return err
+	}
+
+	if err := ioutil.WriteFile(filename+".json", byteData, 0644); err != nil {
+		return err
+	}
+	return nil
 }

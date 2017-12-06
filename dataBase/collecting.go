@@ -4,18 +4,14 @@ import (
 	"github.com/korovkinand/chromedp"
 	"log"
 	"time"
-	"os"
 	"surebetSearch/chrome"
 	"surebetSearch/common"
 	"surebetSearch/dataBase/positive"
 	"surebetSearch/dataBase/types"
 	"errors"
-	"runtime"
 )
 
-var filename = os.ExpandEnv("$GOPATH/src/surebetSearch/dataBase/collectedPairs")
-
-func collect() error {
+func Collect() error {
 	positiveTargets := len(positive.Accounts)
 
 	if err := chrome.RunPool(positiveTargets, "0.0.0.0"); err != nil {
@@ -24,8 +20,8 @@ func collect() error {
 	defer chrome.ClosePool()
 
 	var initLoads []chromedp.Action
-	for curTarget := 0; curTarget < positiveTargets; curTarget++ {
-		initLoads = append(initLoads, positive.InitLoad(curTarget))
+	for _, account := range positive.Accounts {
+		initLoads = append(initLoads, positive.InitLoad(account))
 	}
 
 	if errs := chrome.ExecActions(positive.LoadTimeout, initLoads); len(errs) != 0 {
@@ -35,7 +31,7 @@ func collect() error {
 	var collectedPairs []types.EventPair
 	common.LoadJson(filename, &collectedPairs)
 
-	prevBackup := len(collectedPairs)
+	//prevBackup := len(collectedPairs)
 	for {
 		html := make([]string, positiveTargets)
 		var getHtmlAll []chromedp.Action
@@ -52,16 +48,16 @@ func collect() error {
 				return errors.New("got html with 0 length")
 			}
 
-			newPairs, err := positive.ParseHtml(&html[curTarget])
-			if err != nil {
-				return err
-			}
-
-			uniques := UniqueAndDiff(&collectedPairs, newPairs)
-			if err := savePairs(collectedPairs, &prevBackup); err != nil {
-				return err
-			}
-			log.Printf("Target# %d: %d", curTarget, uniques)
+			//newPairs, err := positive.ParseHtml(&html[curTarget])
+			//if err != nil {
+			//	return err
+			//}
+			//
+			//uniques := UniqueAndDiff(&collectedPairs, newPairs)
+			//if err := savePairs(collectedPairs, &prevBackup); err != nil {
+			//	return err
+			//}
+			//log.Printf("Target# %d: %d", curTarget, uniques)
 		}
 		log.Println(len(collectedPairs))
 		time.Sleep(2 * time.Second)
@@ -83,15 +79,4 @@ func savePairs(collectedPairs []types.EventPair, prevBackup *int) error {
 		}
 	}
 	return nil
-}
-
-func Collect() {
-	for {
-		if err := collect(); err != nil {
-			log.Println(err)
-		}
-		//Look at runtime.MemProfile
-		runtime.GC()
-		time.Sleep(5 * time.Second)
-	}
 }
