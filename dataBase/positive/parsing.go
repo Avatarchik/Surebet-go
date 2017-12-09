@@ -6,10 +6,7 @@ import (
 	"surebetSearch/dataBase/types"
 )
 
-
 func ParseHtml(html *string) ([]types.EventPair, error) {
-	var newPairs []types.EventPair
-
 	doc, err := gokogiri.ParseHtml([]byte(*html))
 	if err != nil {
 		return nil, err
@@ -20,6 +17,8 @@ func ParseHtml(html *string) ([]types.EventPair, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	var newPairs []types.EventPair
 
 	for _, trNode := range trNodes {
 		var eventPair types.EventPair

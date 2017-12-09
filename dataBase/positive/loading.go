@@ -2,19 +2,14 @@ package positive
 
 import (
 	"github.com/korovkinand/chromedp"
-	"github.com/korovkinand/chromedp/cdp"
-	"context"
 	"log"
-	"surebetSearch/dataBase/types"
-	"time"
+	"surebetSearch/chrome"
+	"surebetSearch/common"
 )
-
-var LoadTimeout = 60 * time.Second
-var HtmlTimeout = 30 * time.Second
 
 var LoginUrl = "https://positivebet.com/en/user/login"
 
-var Accounts = []types.Account{
+var Accounts = []common.Account{
 	{"volosha123@gmail.com", "1q1w1e1r"},
 	{"kokozhina@gmail.com", "1q1w1e1r"},
 	{"marshytv@ya.ru", "1q1w1e1r"},
@@ -33,7 +28,7 @@ var MainNode = `.grid-view > table`
 var autoReloadBtn = `#formPanel > #btnAutoRefresh`
 var changeAmountBar = `document.querySelector('#ddlPerPage').value = 30`
 
-func InitLoad(account types.Account) chromedp.Tasks {
+func InitLoad(account common.Account) chromedp.Tasks {
 	var res []byte
 	return chromedp.Tasks{
 		chromedp.Navigate(LoginUrl),
@@ -46,7 +41,7 @@ func InitLoad(account types.Account) chromedp.Tasks {
 		chromedp.WaitVisible(MainNode),
 		chromedp.Click(autoReloadBtn),
 		chromedp.Evaluate(changeAmountBar, &res),
-		chromedp.ActionFunc(func(ctxt context.Context, h cdp.Handler) error {
+		chrome.WrapFunc(func() error {
 			log.Printf("Positive loaded: %s", account.Login)
 			return nil
 		}),

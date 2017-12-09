@@ -1,29 +1,19 @@
 package common
 
 import (
-	"os"
 	"log"
 	"encoding/json"
 	"io/ioutil"
 )
 
-func SaveHtml(url string, content string) error {
+func SaveHtml(url string, data string) error {
 	siteName, err := GetSiteName(url)
 	if err != nil {
 		return err
 	}
-	filename := siteName + ".html"
-
-	f, err := os.Create(filename)
-	if err != nil {
+	if err := ioutil.WriteFile(siteName+".html", []byte(data), 0644); err != nil {
 		return err
 	}
-	defer f.Close()
-
-	b, err := f.WriteString(content)
-	f.Sync()
-
-	log.Printf("wrote %d bytes\n", b)
 	log.Println("Html saved")
 
 	return nil
@@ -47,10 +37,9 @@ func LoadJson(filename string, data interface{}) error {
 		return err
 	}
 
-	err = json.Unmarshal(byteData, &data)
+	err = json.Unmarshal(byteData, data) //Expects data passed by reference
 	if err != nil {
 		return err
 	}
-
 	return nil
 }

@@ -2,15 +2,9 @@ package fonbet
 
 import (
 	"github.com/korovkinand/chromedp"
-	"github.com/korovkinand/chromedp/cdp"
-	"context"
 	"log"
-	"time"
+	"surebetSearch/chrome"
 )
-
-var LoadTimeout = 15 * time.Second
-var ExpandTimeout = 5 * time.Second
-var HtmlTimeout = 3 * time.Second
 
 var Url = "https://www.fonbet104.com/live/"
 var MainNode = `#lineTable > tbody`
@@ -31,35 +25,14 @@ func InitLoad() chromedp.Tasks {
 		chromedp.WaitReady(expandAll),
 		chromedp.Click(expandAll),
 		chromedp.WaitNotVisible(expandAll),
-		chromedp.ActionFunc(func(ctxt context.Context, h cdp.Handler) error {
+		chrome.WrapFunc(func() error {
 			log.Println("Fonbet loaded")
 			return nil
 		}),
 	}
 }
 
-func ExpandEvents() chromedp.Tasks {
+func ExpandEvents() chromedp.Action {
 	var res []byte
-	return chromedp.Tasks{
-		chromedp.Evaluate(openNodesJs, &res),
-	}
-}
-
-var expandAllJs = `document.querySelector('#lineTableHeaderButton').click();
-document.querySelector('#lineHeaderViewActionMenu > div:nth-child(6)').click();`
-
-func ExpandAllJs() chromedp.Tasks {
-	var res []byte
-	return chromedp.Tasks{
-		chromedp.Evaluate(expandAllJs, &res),
-	}
-}
-
-func ExpandAllCdp() chromedp.Tasks {
-	return chromedp.Tasks{
-		chromedp.Click(expand),
-		chromedp.WaitReady(expandAll),
-		chromedp.Click(expandAll),
-		chromedp.WaitNotVisible(expandAll),
-	}
+	return chromedp.Evaluate(openNodesJs, &res)
 }

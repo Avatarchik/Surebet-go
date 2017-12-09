@@ -25,22 +25,6 @@ func SaveScn(url string) chromedp.ActionFunc {
 	}
 }
 
-func GetHtml(html *string) chromedp.ActionFunc {
-	return func(ctx context.Context, c cdp.Handler) error {
-		chromedp.OuterHTML("html", html).Do(ctx, c)
-		log.Printf("Html size: %d", len(*html))
-		return nil
-	}
-}
-
-func GetNodeHtml(sel interface{}, html *string) chromedp.ActionFunc {
-	return func(ctx context.Context, c cdp.Handler) error {
-		chromedp.OuterHTML(sel, html).Do(ctx, c)
-		log.Printf("Html size: %d", len(*html))
-		return nil
-	}
-}
-
 func WrapFunc(fn func() error) chromedp.ActionFunc {
 	return func(ctx context.Context, c cdp.Handler) error {
 		return fn()

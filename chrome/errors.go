@@ -1,24 +1,22 @@
 package chrome
 
 import (
-	"surebetSearch/common"
 	"fmt"
-	"log"
 )
 
-type GoroutineError struct {
-	Errs []error
-	Url  string
-	Msg  string
+type errorInfo struct {
+	err error
+	id  int
 }
 
-func (e *GoroutineError) Error() string {
-	for _, err := range e.Errs {
-		log.Println(err)
+type GoroutinesError struct {
+	errsInfo []errorInfo
+}
+
+func (e *GoroutinesError) Error() string {
+	var str string
+	for _, errInfo := range e.errsInfo {
+		str += fmt.Sprintf("target (%d): %s\n", errInfo.id, errInfo.err)
 	}
-	siteName, err := common.GetSiteName(e.Url)
-	if err != nil {
-		siteName = "#can't parse url#"
-	}
-	return fmt.Sprintf("goroutine error: \"%s\" %s", siteName, e.Msg)
+	return str
 }

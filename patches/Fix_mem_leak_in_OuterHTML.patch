@@ -1,0 +1,21 @@
+Index: query.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- query.go	(revision 5f397b5890a322acb6381baa95854f34dc5f956b)
++++ query.go	(date 1512817414000)
+@@ -322,11 +322,11 @@
+ }
+ 
+ // OuterHTML retrieves the outer html of the first node matching the selector.
+-func OuterHTML(sel interface{}, html *string, opts ...QueryOption) Action {
++func OuterHTML(sel string, html *string) Action {
+ 	if html == nil {
+ 		panic("html cannot be nil")
+ 	}
+-	return JavascriptAttribute(sel, "outerHTML", html, opts...)
++	return Evaluate(fmt.Sprintf("document.querySelector('%s').outerHTML", sel), html)
+ }
+ 
+ // InnerHTML retrieves the inner html of the first node matching the selector.
