@@ -2,18 +2,16 @@ package dataBase
 
 import (
 	"github.com/korovkinand/chromedp"
+	"github.com/korovkinand/chromedp/cdp"
 	"log"
 	"time"
 	"surebetSearch/chrome"
 	"surebetSearch/dataBase/positive"
 	"surebetSearch/dataBase/types"
-	"os"
-	"github.com/korovkinand/chromedp/cdp"
+	"surebetSearch/config/paths"
 	"context"
 	"errors"
 )
-
-var filename = os.ExpandEnv("$GOPATH/src/surebetSearch/dataBase/collectedPairs")
 
 func Collect() error {
 	positiveTargets := len(positive.Accounts)
@@ -33,7 +31,7 @@ func Collect() error {
 	}
 
 	var collectedPairs types.CollectedPairs
-	collectedPairs.Load(filename)
+	collectedPairs.Load(paths.CollectedPairs)
 
 	handleHtmls := make([]chromedp.Action, positiveTargets)
 	for target := range handleHtmls {
@@ -75,12 +73,12 @@ func save(collectedPairs *types.CollectedPairs, prevBackup *int) error {
 	log.Printf("Collected pairs: %d", curPairs)
 
 	if curPairs - *prevBackup > 50 {
-		if err := collectedPairs.Save(filename + ".bkp"); err != nil {
+		if err := collectedPairs.Save(paths.CollectedPairs + ".bkp"); err != nil {
 			return err
 		}
 		*prevBackup = curPairs
 		log.Println("Backup saved")
 	}
 
-	return collectedPairs.Save(filename)
+	return collectedPairs.Save(paths.CollectedPairs)
 }

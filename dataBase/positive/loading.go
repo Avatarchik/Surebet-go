@@ -5,19 +5,10 @@ import (
 	"log"
 	"surebetSearch/chrome"
 	"surebetSearch/common"
+	"surebetSearch/config/paths"
 )
 
 var LoginUrl = "https://positivebet.com/en/user/login"
-
-var Accounts = []common.Account{
-	{"volosha123@gmail.com", "1q1w1e1r"},
-	{"kokozhina@gmail.com", "1q1w1e1r"},
-	{"marshytv@ya.ru", "1q1w1e1r"},
-	{"ilya00@gmail.com", "1q1w1e1r"},
-	{"kolyan312@gmail.com", "1q1w1e1r"},
-	{"petya146@gmail.com", "1q1w1e1r"},
-	{"lester0578@gmail.com", "1q1w1e1r"},
-}
 
 var loginSel = `#UserLogin_username`
 var passSel = `#UserLogin_password`
@@ -27,6 +18,14 @@ var liveBtn = `#yw0 > li:nth-child(2) > a`
 var MainNode = `.grid-view > table`
 var autoReloadBtn = `#formPanel > #btnAutoRefresh`
 var changeAmountBar = `document.querySelector('#ddlPerPage').value = 30`
+
+var Accounts []common.Account
+
+func init() {
+	if err := common.LoadJson(paths.PositiveAccounts, &Accounts); err != nil {
+		log.Panic(err)
+	}
+}
 
 func InitLoad(account common.Account) chromedp.Tasks {
 	var res []byte

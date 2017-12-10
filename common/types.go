@@ -1,5 +1,6 @@
 package common
 
 type Account struct {
-	Login, Password string
+	Login    string `json:"login"`
+	Password string `json:"password"`
 }

@@ -35,7 +35,7 @@ func RunPool(targetNumber int) error {
 	return nil
 }
 
-func RunAction(errChan chan errorInfo, target int, action chromedp.Action) {
+func load(errChan chan errorInfo, target int, action chromedp.Action) {
 	errChan <- errorInfo{targets[target].Run(ctx, action), target}
 }
 
@@ -48,7 +48,7 @@ func RunActions(actions []chromedp.Action) error {
 
 	errChan := make(chan errorInfo, targetNumber)
 	for target := 0; target < targetNumber; target++ {
-		go RunAction(errChan, target, actions[target])
+		go load(errChan, target, actions[target])
 	}
 
 	var errsInfo []errorInfo
