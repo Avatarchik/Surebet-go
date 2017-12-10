@@ -6,6 +6,7 @@ import (
 	"surebetSearch/chrome"
 	"surebetSearch/common"
 	"surebetSearch/config/paths"
+	"surebetSearch/config/accounts"
 )
 
 var LoginUrl = "https://positivebet.com/en/user/login"
@@ -19,10 +20,10 @@ var MainNode = `.grid-view > table`
 var autoReloadBtn = `#formPanel > #btnAutoRefresh`
 var changeAmountBar = `document.querySelector('#ddlPerPage').value = 30`
 
-var Accounts []common.Account
+var Accounts common.Accounts
 
 func init() {
-	if err := common.LoadJson(paths.PositiveAccounts, &Accounts); err != nil {
+	if err := Accounts.LoadRange(paths.PositiveAccounts, accounts.PositiveRange); err != nil {
 		log.Panic(err)
 	}
 }
