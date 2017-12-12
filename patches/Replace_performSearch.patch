@@ -1,0 +1,16 @@
+Index: sel.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- sel.go	(revision 344b8038acfa6d6af1ec146b9ab1dfc2d1fcf7fb)
++++ sel.go	(date 1513114710000)
+@@ -45,7 +45,7 @@
+ 	}
+ 
+ 	if s.by == nil {
+-		BySearch(s)
++		ByQuery(s)
+ 	}
+ 
+ 	if s.wait == nil {
