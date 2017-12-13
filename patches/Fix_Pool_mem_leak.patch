@@ -1,0 +1,34 @@
+Index: pool.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- pool.go	(revision ac7a1e655c86fcf68da03088eecde3fbc292e5f0)
++++ pool.go	(date 1513155115000)
+@@ -56,7 +56,7 @@
+ 	defer p.rw.Unlock()
+ 
+ 	for _, r := range p.res {
+-		r.cancel()
++		r.Release() // may fix the memory leak issue
+ 	}
+ 
+ 	return nil
+@@ -150,6 +150,10 @@
+ 		err = r.c.Wait()
+ 	}
+ 
++	if r.CDP() != nil {
++		r.CDP().Shutdown(r.ctxt)
++	}
++
+ 	defer r.p.debugf("pool released %d", r.port)
+ 
+ 	r.p.rw.Lock()
+@@ -199,4 +203,4 @@
+ 		p.errorf = errorf
+ 		return nil
+ 	}
+-}
++}
+\ No newline at end of file
