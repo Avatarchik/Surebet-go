@@ -11,6 +11,7 @@ import (
 	"surebetSearch/config/paths"
 	"context"
 	"errors"
+	"surebetSearch/config/intervals"
 )
 
 func Collect() error {
@@ -47,7 +48,7 @@ func Collect() error {
 		if err := save(&collectedPairs, &prevBackup); err != nil {
 			return err
 		}
-		time.Sleep(2 * time.Second)
+		time.Sleep(intervals.Positive)
 	}
 
 	return errors.New("infinite loading ended")
