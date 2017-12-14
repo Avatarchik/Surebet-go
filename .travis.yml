@@ -1,0 +1,13 @@
+language: go
+  go:
+    - 1.9.x
+    - 1.x
+addons:
+  apt:
+    packages:
+      - libxml2-dev
+      - libonig-dev
+install:
+  go get -t -u ./...
+script:
+  - go build
