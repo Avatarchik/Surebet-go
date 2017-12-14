@@ -1,9 +1,9 @@
 package common
 
 import (
-	"log"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 )
 
 func SaveHtml(url string, data string) error {

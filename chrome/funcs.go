@@ -1,12 +1,12 @@
 package chrome
 
 import (
-	"io/ioutil"
 	"context"
-	"log"
-	"surebetSearch/common"
 	"github.com/korovkinand/chromedp"
 	"github.com/korovkinand/chromedp/cdp"
+	"github.com/korovkinand/surebetSearch/common"
+	"io/ioutil"
+	"log"
 )
 
 func SaveScn(url string) chromedp.ActionFunc {

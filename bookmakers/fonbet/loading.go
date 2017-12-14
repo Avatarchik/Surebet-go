@@ -2,8 +2,8 @@ package fonbet
 
 import (
 	"github.com/korovkinand/chromedp"
+	"github.com/korovkinand/surebetSearch/chrome"
 	"log"
-	"surebetSearch/chrome"
 )
 
 var Url = "https://www.fonbet104.com/live/"

@@ -1,17 +1,16 @@
 package dataBase
 
 import (
+	"context"
 	"github.com/korovkinand/chromedp"
 	"github.com/korovkinand/chromedp/cdp"
+	"github.com/korovkinand/surebetSearch/chrome"
+	"github.com/korovkinand/surebetSearch/config/intervals"
+	"github.com/korovkinand/surebetSearch/config/paths"
+	"github.com/korovkinand/surebetSearch/dataBase/positive"
+	"github.com/korovkinand/surebetSearch/dataBase/types"
 	"log"
 	"time"
-	"surebetSearch/chrome"
-	"surebetSearch/dataBase/positive"
-	"surebetSearch/dataBase/types"
-	"surebetSearch/config/paths"
-	"context"
-	"errors"
-	"surebetSearch/config/intervals"
 )
 
 func Collect() error {
@@ -50,8 +49,6 @@ func Collect() error {
 		}
 		time.Sleep(intervals.Positive)
 	}
-
-	return errors.New("infinite loading ended")
 }
 
 func handleHtml(collectedPairs *types.CollectedPairs) chromedp.ActionFunc {

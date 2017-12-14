@@ -1,7 +1,7 @@
 package types
 
 import (
-	"surebetSearch/common"
+	"github.com/korovkinand/surebetSearch/common"
 	"sync"
 )
 

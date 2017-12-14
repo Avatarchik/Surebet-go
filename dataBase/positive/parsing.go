@@ -2,8 +2,8 @@ package positive
 
 import (
 	"github.com/jbowtie/gokogiri"
+	"github.com/korovkinand/surebetSearch/dataBase/types"
 	"strings"
-	"surebetSearch/dataBase/types"
 )
 
 func ParseHtml(html *string) ([]types.EventPair, error) {

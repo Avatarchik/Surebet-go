@@ -2,11 +2,11 @@ package positive
 
 import (
 	"github.com/korovkinand/chromedp"
+	"github.com/korovkinand/surebetSearch/chrome"
+	"github.com/korovkinand/surebetSearch/common"
+	"github.com/korovkinand/surebetSearch/config/accounts"
+	"github.com/korovkinand/surebetSearch/config/paths"
 	"log"
-	"surebetSearch/chrome"
-	"surebetSearch/common"
-	"surebetSearch/config/paths"
-	"surebetSearch/config/accounts"
 )
 
 var LoginUrl = "https://positivebet.com/en/user/login"

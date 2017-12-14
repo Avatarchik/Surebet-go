@@ -1,7 +1,7 @@
 package main
 
 import (
-	"surebetSearch/dataBase"
+	"github.com/korovkinand/surebetSearch/dataBase"
 )
 
 func main() {

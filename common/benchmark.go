@@ -1,8 +1,8 @@
 package common
 
 import (
-	"time"
 	"fmt"
+	"time"
 )
 
 type FuncInfo struct {

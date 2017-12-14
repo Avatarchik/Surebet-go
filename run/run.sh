@@ -1,2 +1,2 @@
 #!/bin/bash
-go build surebetSearch && ./surebetSearch
+go build ../ && ./surebetSearch

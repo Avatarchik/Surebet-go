@@ -1,7 +1,7 @@
 package fonbet
 
 import (
-	"surebetSearch/common"
+	"github.com/korovkinand/surebetSearch/common"
 )
 
 func ParseHtml(html *string) (common.Bet, error) {

@@ -2,11 +2,11 @@ package chrome
 
 import (
 	"context"
-	"surebetSearch/config/chrome"
-	"github.com/korovkinand/chromedp"
-	"fmt"
-	"log"
 	"errors"
+	"fmt"
+	"github.com/korovkinand/chromedp"
+	"github.com/korovkinand/surebetSearch/config/chrome"
+	"log"
 )
 
 var ctx context.Context
@@ -15,8 +15,6 @@ var cancel context.CancelFunc
 var targets []*chromedp.Res
 
 func RunPool(targetNumber int) error {
-	ctx, cancel = context.WithCancel(context.Background())
-
 	var err error
 	// create pool
 	pool, err = chromedp.NewPool(chromedp.PortRange(chrome.StartPort, chrome.StartPort+targetNumber))
@@ -24,11 +22,14 @@ func RunPool(targetNumber int) error {
 		return err
 	}
 
+	ctx, cancel = context.WithCancel(context.Background())
+
 	targets = make([]*chromedp.Res, targetNumber)
 	for i := 0; i < targetNumber; i++ {
 		// allocate
 		targets[i], err = pool.Allocate(ctx, chrome.Options...)
 		if err != nil {
+			cancel()
 			return fmt.Errorf("instance (%d) error: %v", i, err)
 		}
 	}

@@ -2,8 +2,8 @@ package dataBase
 
 import (
 	"fmt"
-	"surebetSearch/config/paths"
-	"surebetSearch/dataBase/types"
+	"github.com/korovkinand/surebetSearch/config/paths"
+	"github.com/korovkinand/surebetSearch/dataBase/types"
 	"unicode"
 )
 
