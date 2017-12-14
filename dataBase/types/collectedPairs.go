@@ -1,13 +1,34 @@
 package types
 
 import (
-	"sync"
 	"surebetSearch/common"
+	"sync"
 )
 
 type CollectedPairs struct {
 	v   []EventPair
 	mux sync.RWMutex
+}
+
+type CollectedPairsItem struct {
+	Idx int
+	V   EventPair
+}
+
+func (c *CollectedPairs) Iter() <-chan CollectedPairsItem {
+	ch := make(chan CollectedPairsItem)
+
+	go func() {
+		defer close(ch)
+		c.mux.RLock()
+		defer c.mux.RUnlock()
+
+		for idx, value := range c.v {
+			ch <- CollectedPairsItem{idx, value}
+		}
+	}()
+
+	return ch
 }
 
 func (c *CollectedPairs) AppendUnique(newPairs []EventPair) {
