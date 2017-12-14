@@ -12,7 +12,9 @@ import (
 func SaveScn(url string) chromedp.ActionFunc {
 	return func(ctx context.Context, c cdp.Handler) error {
 		var buf []byte
-		chromedp.CaptureScreenshot(&buf).Do(ctx, c)
+		if err := chromedp.CaptureScreenshot(&buf).Do(ctx, c); err != nil {
+			return err
+		}
 		siteName, err := common.GetSiteName(url)
 		if err != nil {
 			return err

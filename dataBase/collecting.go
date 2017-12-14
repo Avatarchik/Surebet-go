@@ -58,7 +58,9 @@ func handleHtml(collectedPairs *types.CollectedPairs) chromedp.ActionFunc {
 	var html string
 	return func(ctx context.Context, c cdp.Handler) error {
 		//Expects fixed code in fork of knq repo
-		chromedp.OuterHTML(positive.MainNode, &html).Do(ctx, c)
+		if err := chromedp.OuterHTML(positive.MainNode, &html).Do(ctx, c); err != nil {
+			return err
+		}
 		newPairs, err := positive.ParseHtml(&html)
 		if err != nil {
 			return err
