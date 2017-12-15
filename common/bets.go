@@ -29,8 +29,16 @@ type Event struct {
 	Parts []Bets
 }
 
-type Sport map[string][]Event
+type Sports struct {
+	Soccer []Event
+	Tennis []Event
+	Hockey []Event
+	Basket []Event
+	Volley []Event
+}
 
-type Bookmaker map[string]Sport
-
-type AllEvents map[string]Bookmaker
+type Bookmakers struct {
+	Fonbet   Sports
+	Olimp    Sports
+	Marathon Sports
+}
