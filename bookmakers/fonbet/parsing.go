@@ -4,6 +4,8 @@ import (
 	"github.com/korovkinand/surebetSearch/common"
 )
 
-func ParseHtml(html *string) (common.Bookmaker, error) {
-	return common.Bookmaker{}, nil
+var tablePath = `//*[@id="lineTable"]/tbody`
+
+func ParseHtml(html *string) (common.Sports, error) {
+	return common.Sports{}, nil
 }
