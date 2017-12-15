@@ -10,6 +10,7 @@ addons:
 install:
   go get -t -u ./...
 script:
-  - cd ./run
-  - chmod +x ./test.sh
-  - ./test.sh
+  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./bookmakers/...
+  - go test -v -race -coverprofile=coverage.txt -covermode=atomic ./dataBase
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -t c17f4a41-855f-4af3-aa9f-33527a755940
