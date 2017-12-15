@@ -7,7 +7,3 @@ addons:
     packages:
       - libxml2-dev
       - libonig-dev
-install:
-  go get -t -u ./...
-script:
-  - ./run/test.sh
