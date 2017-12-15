@@ -3,6 +3,7 @@ language: go
     - 1.9.x
     - 1.x
 addons:
+  chrome: stable
   apt:
     packages:
       - libxml2-dev
@@ -10,4 +11,4 @@ addons:
 install:
   go get -t -u ./...
 script:
-  - go build
+  - go test
