@@ -14,9 +14,8 @@ var pool *chromedp.Pool
 var cancel context.CancelFunc
 var targets []*chromedp.Res
 
-func RunPool(targetNumber int) error {
+func runPool(targetNumber int) error {
 	var err error
-	// create pool
 	pool, err = chromedp.NewPool(chromedp.PortRange(chrome.StartPort, chrome.StartPort+targetNumber))
 	if err != nil {
 		return err
@@ -26,13 +25,14 @@ func RunPool(targetNumber int) error {
 
 	targets = make([]*chromedp.Res, targetNumber)
 	for i := 0; i < targetNumber; i++ {
-		// allocate
 		targets[i], err = pool.Allocate(ctx, chrome.Options...)
 		if err != nil {
-			cancel()
+			ClosePool()
 			return fmt.Errorf("instance (%d) error: %v", i, err)
 		}
 	}
+
+	log.Print("Pool allocated")
 	return nil
 }
 
@@ -64,11 +64,22 @@ func RunActions(actions []chromedp.Action) error {
 	return nil
 }
 
-func ClosePool() {
-	defer cancel()
-	//Expects proper pool closing in fork of knq repo
-	err := pool.Shutdown()
-	if err != nil {
-		log.Panic(err)
+func InitPool(actions []chromedp.Action) error {
+	if err := runPool(len(actions)); err != nil {
+		return err
 	}
+	return RunActions(actions)
+}
+
+func ClosePool() {
+	if cancel != nil {
+		defer cancel()
+	}
+	if pool != nil {
+		//Expects proper pool closing in fork of knq repo
+		if err := pool.Shutdown(); err != nil {
+			log.Panic(err)
+		}
+	}
+	log.Print("Pool closed")
 }

@@ -16,19 +16,15 @@ import (
 func Collect() error {
 	positiveTargets := len(positive.Accounts)
 
-	if err := chrome.RunPool(positiveTargets); err != nil {
-		return err
-	}
-	defer chrome.ClosePool()
-
 	initLoads := make([]chromedp.Action, positiveTargets)
 	for target := range initLoads {
 		initLoads[target] = positive.InitLoad(positive.Accounts[target])
 	}
 
-	if err := chrome.RunActions(initLoads); err != nil {
+	if err := chrome.InitPool(initLoads); err != nil {
 		return err
 	}
+	defer chrome.ClosePool()
 
 	var collectedPairs types.CollectedPairs
 	collectedPairs.Load(paths.CollectedPairs)
@@ -39,7 +35,8 @@ func Collect() error {
 	}
 
 	prevBackup := collectedPairs.Length()
-	for {
+	workBegin := time.Now()
+	for time.Since(workBegin) < intervals.PositiveWorkLimit {
 		if err := chrome.RunActions(handleHtmls); err != nil {
 			return err
 		}
@@ -47,8 +44,10 @@ func Collect() error {
 		if err := save(&collectedPairs, &prevBackup); err != nil {
 			return err
 		}
-		time.Sleep(intervals.Positive)
+		time.Sleep(intervals.PositiveSleep)
 	}
+	log.Print("Collecting ended")
+	return nil
 }
 
 func handleHtml(collectedPairs *types.CollectedPairs) chromedp.ActionFunc {
@@ -72,7 +71,7 @@ func save(collectedPairs *types.CollectedPairs, prevBackup *int) error {
 	curPairs := collectedPairs.Length()
 	log.Printf("Collected pairs: %d", curPairs)
 
-	if curPairs - *prevBackup > 50 {
+	if curPairs-*prevBackup > 50 {
 		if err := collectedPairs.Save(paths.CollectedPairs + ".bkp"); err != nil {
 			return err
 		}

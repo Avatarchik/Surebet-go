@@ -3,32 +3,29 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
---- pool.go	(revision ac7a1e655c86fcf68da03088eecde3fbc292e5f0)
-+++ pool.go	(date 1513155115000)
-@@ -56,7 +56,7 @@
- 	defer p.rw.Unlock()
+--- pool.go	(revision 6c387099ed961f654fadd34c56494a9df5ece081)
++++ pool.go	(date 1513347679000)
+@@ -52,11 +52,8 @@
  
+ // Shutdown releases all the pool resources.
+ func (p *Pool) Shutdown() error {
+-	p.rw.Lock()
+-	defer p.rw.Unlock()
+-
  	for _, r := range p.res {
 -		r.cancel()
-+		r.Release() // may fix the memory leak issue
++		r.Release()
  	}
  
  	return nil
-@@ -150,6 +150,10 @@
- 		err = r.c.Wait()
- 	}
+@@ -143,6 +140,10 @@
  
-+	if r.CDP() != nil {
-+		r.CDP().Shutdown(r.ctxt)
+ // Release releases the pool resource.
+ func (r *Res) Release() error {
++	if r.c != nil {
++		r.c.Shutdown(r.ctxt)
 +	}
 +
- 	defer r.p.debugf("pool released %d", r.port)
+ 	r.cancel()
  
- 	r.p.rw.Lock()
-@@ -199,4 +203,4 @@
- 		p.errorf = errorf
- 		return nil
- 	}
--}
-+}
-\ No newline at end of file
+ 	var err error

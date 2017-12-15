@@ -1,7 +1,6 @@
 language: go
 go:
   - 1.9.x
-  - 1.x
 addons:
   chrome: stable
   apt:
@@ -11,4 +10,4 @@ addons:
 install:
   go get -t -u ./...
 script:
-  - go test
+  - ./run/test.sh
