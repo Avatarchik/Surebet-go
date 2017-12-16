@@ -1,12 +1,14 @@
-package positive
+package posit
 
 import (
 	"github.com/jbowtie/gokogiri"
-	"github.com/korovkinand/surebetSearch/dataBase/types"
+	"github.com/korovkinand/surebetSearch/scanners"
 	"strings"
 )
 
-func ParseHtml(html *string) ([]types.EventPair, error) {
+type EventPair = scanners.EventPair
+
+func ParseHtml(html *string) ([]EventPair, error) {
 	doc, err := gokogiri.ParseHtml([]byte(*html))
 	if err != nil {
 		return nil, err
@@ -18,10 +20,10 @@ func ParseHtml(html *string) ([]types.EventPair, error) {
 		return nil, err
 	}
 
-	var newPairs []types.EventPair
+	var newPairs []EventPair
 
 	for _, trNode := range trNodes {
-		var eventPair types.EventPair
+		var eventPair EventPair
 
 		bookmakers, err := trNode.Search(`.//td[3]/a`)
 		if err != nil {
@@ -35,9 +37,9 @@ func ParseHtml(html *string) ([]types.EventPair, error) {
 			}
 
 			if curMaker == 0 {
-				eventPair.FirstEvent.BookMaker = gotText[0].String()
+				eventPair.Event1.Site = gotText[0].String()
 			} else {
-				eventPair.SecondEvent.BookMaker = gotText[0].String()
+				eventPair.Event2.Site = gotText[0].String()
 			}
 		}
 
@@ -53,9 +55,9 @@ func ParseHtml(html *string) ([]types.EventPair, error) {
 
 			teams := strings.Split(gotText[0].String(), " vs ")
 			if curMatch == 0 {
-				eventPair.FirstEvent.FirstTeam, eventPair.FirstEvent.SecondTeam = teams[0], teams[1]
+				eventPair.Event1.Team1, eventPair.Event1.Team2 = teams[0], teams[1]
 			} else {
-				eventPair.SecondEvent.FirstTeam, eventPair.SecondEvent.SecondTeam = teams[0], teams[1]
+				eventPair.Event2.Team1, eventPair.Event2.Team2 = teams[0], teams[1]
 			}
 		}
 

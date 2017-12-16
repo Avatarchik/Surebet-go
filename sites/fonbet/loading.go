@@ -3,11 +3,9 @@ package fonbet
 import (
 	"github.com/korovkinand/chromedp"
 	"github.com/korovkinand/surebetSearch/chrome"
+	"github.com/korovkinand/surebetSearch/config/info"
 	"log"
 )
-
-var Url = "https://www.fonbet104.com/live/"
-var MainNode = `#lineTable > tbody`
 
 var expand = "#lineTableHeaderButton"
 var expandAll = "#lineHeaderViewActionMenu > .popupMenuItem:nth-child(6)"
@@ -19,7 +17,7 @@ for (cur_node = 0; cur_node < nodes.length; cur_node++) {
 
 func InitLoad() chromedp.Tasks {
 	return chromedp.Tasks{
-		chromedp.Navigate(Url),
+		chromedp.Navigate(info.Fonbet.Url),
 		chromedp.WaitReady(expand),
 		chromedp.Click(expand),
 		chromedp.WaitReady(expandAll),

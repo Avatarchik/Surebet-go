@@ -1,22 +1,22 @@
-package types
+package scanners
 
 import (
 	"github.com/korovkinand/surebetSearch/common"
 	"sync"
 )
 
-type CollectedPairs struct {
+type EventPairs struct {
 	v   []EventPair
 	mux sync.RWMutex
 }
 
-type CollectedPairsItem struct {
+type EvPairsItem struct {
 	Idx int
 	V   EventPair
 }
 
-func (c *CollectedPairs) Iter() <-chan CollectedPairsItem {
-	ch := make(chan CollectedPairsItem)
+func (c *EventPairs) Iter() <-chan EvPairsItem {
+	ch := make(chan EvPairsItem)
 
 	go func() {
 		defer close(ch)
@@ -24,14 +24,14 @@ func (c *CollectedPairs) Iter() <-chan CollectedPairsItem {
 		defer c.mux.RUnlock()
 
 		for idx, value := range c.v {
-			ch <- CollectedPairsItem{idx, value}
+			ch <- EvPairsItem{idx, value}
 		}
 	}()
 
 	return ch
 }
 
-func (c *CollectedPairs) AppendUnique(newPairs []EventPair) {
+func (c *EventPairs) AppendUnique(newPairs []EventPair) {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 
@@ -46,21 +46,21 @@ loop:
 	}
 }
 
-func (c *CollectedPairs) Length() int {
+func (c *EventPairs) Length() int {
 	c.mux.RLock()
 	defer c.mux.RUnlock()
 
 	return len(c.v)
 }
 
-func (c *CollectedPairs) Load(filename string) error {
+func (c *EventPairs) Load(filename string) error {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 
 	return common.LoadJson(filename, &(c.v))
 }
 
-func (c *CollectedPairs) Save(filename string) error {
+func (c *EventPairs) Save(filename string) error {
 	c.mux.RLock()
 	defer c.mux.RUnlock()
 

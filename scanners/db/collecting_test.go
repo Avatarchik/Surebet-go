@@ -1,0 +1,15 @@
+package db
+
+import (
+	"github.com/korovkinand/surebetSearch/common"
+	"github.com/korovkinand/surebetSearch/config/info"
+	"testing"
+)
+
+func TestCollect(t *testing.T) {
+	info.Posit.Acc.Rng = common.Range{11, 14}
+	info.Posit.Times.Limit = info.Posit.Times.Sleep + 10
+	if err := Collect(); err != nil {
+		t.Error(err)
+	}
+}

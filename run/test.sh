@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd ..
+
 set -e
 echo "" > coverage.txt
 

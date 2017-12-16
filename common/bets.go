@@ -7,20 +7,23 @@ type condFactor struct {
 	Value factor
 }
 
+type factors []factor
+type condFactors []condFactor
+
 type Bets struct {
 	Part  int
-	O1    []factor
-	OX    []factor
-	O2    []factor
-	O1X   []factor
-	O12   []factor
-	OX2   []factor
-	TO    []condFactor
-	TU    []condFactor
-	IndTO []condFactor
-	IndTU []condFactor
-	Hand1 []condFactor
-	Hand2 []condFactor
+	O1    factors
+	OX    factors
+	O2    factors
+	O1X   factors
+	O12   factors
+	OX2   factors
+	TO    condFactors
+	TU    condFactors
+	IndTO condFactors
+	IndTU condFactors
+	Hand1 condFactors
+	Hand2 condFactors
 }
 
 type Event struct {
@@ -29,12 +32,14 @@ type Event struct {
 	Parts []Bets
 }
 
+type Events []Event
+
 type Sports struct {
-	Soccer []Event
-	Tennis []Event
-	Hockey []Event
-	Basket []Event
-	Volley []Event
+	Soccer Events
+	Tennis Events
+	Hockey Events
+	Basket Events
+	Volley Events
 }
 
 type Bookmakers struct {

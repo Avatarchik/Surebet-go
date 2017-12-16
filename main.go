@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/korovkinand/surebetSearch/dataBase"
+	"github.com/korovkinand/surebetSearch/scanners/db"
 	"log"
 )
 
 func main() {
-	if err := dataBase.Collect(); err != nil {
+	if err := db.Collect(); err != nil {
 		log.Panic(err)
 	}
 }

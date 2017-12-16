@@ -5,16 +5,21 @@ type Account struct {
 	Password string `json:"password"`
 }
 
-type Accounts []Account
-
 type Range struct {
 	From, To int
 }
 
-func (a *Accounts) LoadRange(filename string, rng Range) error {
-	if err := LoadJson(filename, a); err != nil {
+type Accounts struct {
+	V    []Account
+	Rng  Range
+	Path string
+}
+
+func (a *Accounts) Load() error {
+	var accounts []Account
+	if err := LoadJson(a.Path, &accounts); err != nil {
 		return err
 	}
-	*a = (*a)[rng.From:rng.To]
+	a.V = accounts[a.Rng.From:a.Rng.To]
 	return nil
 }

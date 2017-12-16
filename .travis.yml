@@ -10,6 +10,7 @@ addons:
 install:
   go get -t -u ./...
 script:
+  - cd ./run
   - chmod +x ./test.sh
   - ./test.sh
 after_success:
