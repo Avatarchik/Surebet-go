@@ -5,16 +5,16 @@ import (
 	"time"
 )
 
-type Intervals struct {
+type Time struct {
 	Sleep time.Duration
 	Limit time.Duration
 }
 
 type SiteInfo struct {
-	Acc   Accounts
-	Times Intervals
-	Url   string
-	Node  string
+	Acc  Accounts
+	Time Time
+	Url  string
+	Node string
 
 	name    string
 	prevUrl string

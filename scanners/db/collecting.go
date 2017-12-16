@@ -43,7 +43,7 @@ func Collect() error {
 
 	prevBackup := eventPairs.Length()
 	workBegin := time.Now()
-	for time.Since(workBegin) < info.Posit.Times.Limit {
+	for time.Since(workBegin) < info.Posit.Time.Limit {
 		if err := chrome.RunActions(handleHtmls); err != nil {
 			return err
 		}
@@ -51,7 +51,7 @@ func Collect() error {
 		if err := save(&eventPairs, &prevBackup); err != nil {
 			return err
 		}
-		time.Sleep(info.Posit.Times.Sleep)
+		time.Sleep(info.Posit.Time.Sleep)
 	}
 	log.Print("Collecting ended")
 	return nil

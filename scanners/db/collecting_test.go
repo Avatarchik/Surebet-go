@@ -8,7 +8,7 @@ import (
 
 func TestCollect(t *testing.T) {
 	info.Posit.Acc.Rng = common.Range{11, 14}
-	info.Posit.Times.Limit = info.Posit.Times.Sleep + 10
+	info.Posit.Time.Limit = (info.Posit.Time.Sleep * 3) / 2
 	if err := Collect(); err != nil {
 		t.Error(err)
 	}
