@@ -4,34 +4,28 @@ import (
 	"github.com/korovkinand/chromedp"
 	"github.com/korovkinand/surebetSearch/chrome"
 	"github.com/korovkinand/surebetSearch/common"
-	"github.com/korovkinand/surebetSearch/config/info"
-	"log"
+	"github.com/korovkinand/surebetSearch/config"
 )
 
-var loginSel = `#UserLogin_username`
-var passSel = `#UserLogin_password`
-var loginBtn = `#login-form > div.form-actions > button`
+var s *common.SiteInfo
 
-var liveBtn = `#yw0 > li:nth-child(2) > a`
-var autoReloadBtn = `#formPanel > #btnAutoRefresh`
-var changeAmountBar = `document.querySelector('#ddlPerPage').value = 30`
+func init() {
+	s = config.Sites.Posit
+}
 
 func InitLoad(account common.Account) chromedp.Tasks {
 	var res []byte
 	return chromedp.Tasks{
-		chromedp.Navigate(info.Posit.Url),
-		chromedp.WaitVisible(loginSel),
-		chromedp.SendKeys(loginSel, account.Login),
-		chromedp.SendKeys(passSel, account.Password),
-		chromedp.Click(loginBtn),
-		chromedp.WaitNotPresent(loginBtn),
-		chromedp.Click(liveBtn),
-		chromedp.WaitVisible(info.Posit.Node),
-		chromedp.Click(autoReloadBtn),
-		chromedp.Evaluate(changeAmountBar, &res),
-		chrome.WrapFunc(func() error {
-			log.Printf("Positive loaded: %s", account.Login)
-			return nil
-		}),
+		chromedp.Navigate(s.Url),
+		chromedp.WaitVisible(s.Sel["login"]),
+		chromedp.SendKeys(s.Sel["login"], account.Login),
+		chromedp.SendKeys(s.Sel["pass"], account.Password),
+		chromedp.Click(s.Sel["loginBtn"]),
+		chromedp.WaitNotPresent(s.Sel["loginBtn"]),
+		chromedp.Click(s.Sel["liveBtn"]),
+		chromedp.WaitVisible(s.Node),
+		chromedp.Click(s.Sel["autoReloadBtn"]),
+		chromedp.Evaluate(s.Js["changeAmountBar"], &res),
+		chrome.LogLoaded(s.FullName(), account.Login),
 	}
 }

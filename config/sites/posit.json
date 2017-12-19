@@ -1,0 +1,22 @@
+{
+	"url": "https://positivebet.com/en/user/login",
+	"time": {
+		"sleep": 35000000000,
+		"limit": 86400000000000
+	},
+	"range": {
+		"from": 0,
+		"to": 7
+	},
+	"node": ".grid-view \u003e table",
+	"sel": {
+		"autoReloadBtn": "#formPanel \u003e #btnAutoRefresh",
+		"liveBtn": "#yw0 \u003e li:nth-child(2) \u003e a",
+		"login": "#UserLogin_username",
+		"loginBtn": "#login-form \u003e div.form-actions \u003e button",
+		"pass": "#UserLogin_password"
+	},
+	"js": {
+		"changeAmountBar": "document.querySelector('#ddlPerPage').value = 30"
+	}
+}

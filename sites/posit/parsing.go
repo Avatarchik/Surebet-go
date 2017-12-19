@@ -2,14 +2,14 @@ package posit
 
 import (
 	"github.com/jbowtie/gokogiri"
-	"github.com/korovkinand/surebetSearch/scanners"
+	"github.com/korovkinand/surebetSearch/common"
 	"strings"
 )
 
-type EventPair = scanners.EventPair
+type EventPair = common.EventPair
 
-func ParseHtml(html *string) ([]EventPair, error) {
-	doc, err := gokogiri.ParseHtml([]byte(*html))
+func ParseHtml(html string) ([]EventPair, error) {
+	doc, err := gokogiri.ParseHtml([]byte(html))
 	if err != nil {
 		return nil, err
 	}

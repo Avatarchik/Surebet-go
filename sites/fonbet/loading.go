@@ -3,34 +3,27 @@ package fonbet
 import (
 	"github.com/korovkinand/chromedp"
 	"github.com/korovkinand/surebetSearch/chrome"
-	"github.com/korovkinand/surebetSearch/config/info"
-	"log"
+	"github.com/korovkinand/surebetSearch/common"
+	"github.com/korovkinand/surebetSearch/config"
 )
 
-var expand = "#lineTableHeaderButton"
-var expandAll = "#lineHeaderViewActionMenu > .popupMenuItem:nth-child(6)"
+var s *common.SiteInfo
 
-var openNodesJs = `nodes = document.querySelectorAll('span[style="display: inline-block;"].detailArrowClose')
-for (cur_node = 0; cur_node < nodes.length; cur_node++) {
-    nodes[cur_node].click()
-}`
+func init() {
+	s = config.Sites.Fonbet
+}
 
 func InitLoad() chromedp.Tasks {
 	return chromedp.Tasks{
-		chromedp.Navigate(info.Fonbet.Url),
-		chromedp.WaitReady(expand),
-		chromedp.Click(expand),
-		chromedp.WaitReady(expandAll),
-		chromedp.Click(expandAll),
-		chromedp.WaitNotVisible(expandAll),
-		chrome.WrapFunc(func() error {
-			log.Println("Fonbet loaded")
-			return nil
-		}),
+		chromedp.Navigate(s.Url),
+		chrome.WaitClick(s.Sel["expand"]),
+		chrome.WaitClick(s.Sel["expandAll"]),
+		chromedp.WaitNotVisible(s.Sel["expandAll"]),
+		chrome.LogLoaded(s.FullName(), ""),
 	}
 }
 
 func ExpandEvents() chromedp.Action {
 	var res []byte
-	return chromedp.Evaluate(openNodesJs, &res)
+	return chromedp.Evaluate(s.Js["openNodes"], &res)
 }

@@ -2,24 +2,32 @@ package common
 
 type Account struct {
 	Login    string `json:"login"`
-	Password string `json:"password"`
+	Password string `json:"pass"`
 }
 
 type Range struct {
-	From, To int
+	From int `json:"from"`
+	To   int `json:"to"`
 }
 
 type Accounts struct {
-	V    []Account
-	Rng  Range
-	Path string
+	v   []Account
+	all []Account
 }
 
-func (a *Accounts) Load() error {
-	var accounts []Account
-	if err := LoadJson(a.Path, &accounts); err != nil {
-		return err
-	}
-	a.V = accounts[a.Rng.From:a.Rng.To]
-	return nil
+func (a *Accounts) SetRange(rng *Range) {
+	a.v = a.all[rng.From:rng.To]
+}
+
+func (a *Accounts) Set(accounts []Account) {
+	a.all = accounts
+	a.v = a.all
+}
+
+func (a *Accounts) Size() int {
+	return len(a.v)
+}
+
+func (a *Accounts) Values() []Account {
+	return a.v
 }

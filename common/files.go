@@ -20,7 +20,7 @@ func SaveHtml(url string, data string) error {
 }
 
 func SaveJson(filename string, data interface{}) error {
-	byteData, err := json.Marshal(data)
+	byteData, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		return err
 	}

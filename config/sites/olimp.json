@@ -1,0 +1,7 @@
+{
+	"url": "https://olimp.com/betting",
+	"sel": {
+		"next": "#submitLiveMatches \u003e td \u003e input:nth-child(5)",
+		"selectAll": "#submitLiveMatches \u003e td \u003e input:nth-child(3)"
+	}
+}

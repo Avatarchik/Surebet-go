@@ -28,6 +28,7 @@ func runPool(targetNumber int) error {
 		targets[i], err = pool.Allocate(ctx, chrome.Options...)
 		if err != nil {
 			ClosePool()
+			log.Println("Pool allocating error")
 			return fmt.Errorf("instance (%d) error: %v", i, err)
 		}
 	}
@@ -44,7 +45,7 @@ func RunActions(actions []chromedp.Action) error {
 	targetNumber := len(targets)
 
 	if targetNumber != len(actions) {
-		return errors.New("number of actions is not equal to number of targets")
+		return errors.New("numbers of actions and targets aren't equal")
 	}
 
 	errChan := make(chan errorInfo, targetNumber)
@@ -59,6 +60,7 @@ func RunActions(actions []chromedp.Action) error {
 		}
 	}
 	if len(errsInfo) != 0 {
+		log.Println("Running actions error")
 		return &GoroutinesError{errsInfo}
 	}
 	return nil
