@@ -8,7 +8,7 @@ import (
 )
 
 func TestCollect(t *testing.T) {
-	s.Rng = &common.Range{11, 14}
+	s.Rng = &common.Range{From: 11, To: 14}
 	accounts.SetRange(s.Rng)
 
 	s.Time.Sleep = 10 * time.Second
