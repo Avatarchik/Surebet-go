@@ -40,10 +40,14 @@ func Collect(filename string) error {
 		initLoads[target] = posit.InitLoad(accounts.Values()[target])
 	}
 
-	if err := chrome.InitPool(initLoads); err != nil {
+	if err := chrome.RunPool(len(initLoads)); err != nil {
 		return err
 	}
 	defer chrome.ClosePool()
+
+	if err := chrome.RunActions(initLoads...); err != nil {
+		return err
+	}
 
 	handleHtmls := make([]chromedp.Action, positiveTargets)
 	for target := range handleHtmls {
@@ -53,7 +57,7 @@ func Collect(filename string) error {
 	prevBackup := evPairs.Size()
 	workBegin := time.Now()
 	for time.Since(workBegin) < s.Time.Limit {
-		if err := chrome.RunActions(handleHtmls); err != nil {
+		if err := chrome.RunActions(handleHtmls...); err != nil {
 			return err
 		}
 

@@ -7,8 +7,8 @@ addons:
     packages:
       - libxml2-dev
       - libonig-dev
-install:
-  go get -t -u ./...
+before_install:
+  go get -t honnef.co/go/tools/cmd/staticcheck
 script:
   - cd ./run
   - chmod +x ./test.sh

@@ -9,12 +9,14 @@ import (
 	"log"
 )
 
+type action = chromedp.Action
+
 var ctx context.Context
-var pool *chromedp.Pool
 var cancel context.CancelFunc
+var pool *chromedp.Pool
 var targets []*chromedp.Res
 
-func runPool(targetNumber int) error {
+func RunPool(targetNumber int) error {
 	var err error
 	pool, err = chromedp.NewPool(chromedp.PortRange(chrome.StartPort, chrome.StartPort+targetNumber))
 	if err != nil {
@@ -37,11 +39,11 @@ func runPool(targetNumber int) error {
 	return nil
 }
 
-func load(errChan chan errorInfo, target int, action chromedp.Action) {
-	errChan <- errorInfo{targets[target].Run(ctx, action), target}
+func load(errChan chan errorInfo, target int, act action) {
+	errChan <- errorInfo{targets[target].Run(ctx, act), target}
 }
 
-func RunActions(actions []chromedp.Action) error {
+func RunActions(actions ...action) error {
 	targetNumber := len(targets)
 
 	if targetNumber != len(actions) {
@@ -66,16 +68,9 @@ func RunActions(actions []chromedp.Action) error {
 	return nil
 }
 
-func InitPool(actions []chromedp.Action) error {
-	if err := runPool(len(actions)); err != nil {
-		return err
-	}
-	return RunActions(actions)
-}
-
 func ClosePool() {
-	if cancel != nil {
-		defer cancel()
+	if ctx != nil {
+		cancel()
 	}
 	if pool != nil {
 		//Expects proper pool closing in fork of knq repo

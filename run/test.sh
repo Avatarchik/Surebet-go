@@ -11,4 +11,13 @@ for d in $(go list ./... | grep -v vendor); do
         cat profile.out >> coverage.txt
         rm profile.out
     fi
+
+    vet_flags=""
+    if [[ $d == *"/surebetSearch/chrome" ]]; then
+        vet_flags="-lostcancel=false"
+    fi
+
+    go vet $vet_flags $d
+
+    staticcheck $d
 done
