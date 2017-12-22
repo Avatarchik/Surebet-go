@@ -16,8 +16,8 @@ func init() {
 func InitLoad() chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(s.Url),
-		chrome.WaitClick(s.Sel["expand"]),
-		chrome.WaitClick(s.Sel["expandAll"]),
+		chromedp.Click(s.Sel["expand"]),
+		chromedp.Click(s.Sel["expandAll"]),
 		chromedp.WaitNotVisible(s.Sel["expandAll"]),
 		chrome.LogLoaded(s.FullName(), ""),
 	}

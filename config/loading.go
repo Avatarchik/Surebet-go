@@ -16,16 +16,16 @@ var Sites = common.MakeSitesInfo()
 var Accounts = common.MakeAccountsInfo()
 
 func loadSites() error {
-	if err := common.LoadJson(sitesPath+fonbet, Sites.Fonbet); err != nil {
+	if err := common.LoadJson(sitesConfigDir+fonbet, Sites.Fonbet); err != nil {
 		return err
 	}
-	if err := common.LoadJson(sitesPath+marat, Sites.Marat); err != nil {
+	if err := common.LoadJson(sitesConfigDir+marat, Sites.Marat); err != nil {
 		return err
 	}
-	if err := common.LoadJson(sitesPath+olimp, Sites.Olimp); err != nil {
+	if err := common.LoadJson(sitesConfigDir+olimp, Sites.Olimp); err != nil {
 		return err
 	}
-	if err := common.LoadJson(sitesPath+posit, Sites.Posit); err != nil {
+	if err := common.LoadJson(sitesConfigDir+posit, Sites.Posit); err != nil {
 		return err
 	}
 	return nil
@@ -33,7 +33,7 @@ func loadSites() error {
 
 func loadAccounts() error {
 	var accounts []common.Account
-	if err := common.LoadJson(accountsPath+posit, &accounts); err != nil {
+	if err := common.LoadJson(accountsDir+posit, &accounts); err != nil {
 		return err
 	}
 	Accounts.Posit.Set(accounts)

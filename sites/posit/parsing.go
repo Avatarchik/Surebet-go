@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-type EventPair = common.EventPair
+type eventPair = common.EventPair
 
-func ParseHtml(html string) ([]EventPair, error) {
+func Parse(html string) ([]common.EventPair, error) {
 	doc, err := gokogiri.ParseHtml([]byte(html))
 	if err != nil {
 		return nil, err
@@ -20,10 +20,10 @@ func ParseHtml(html string) ([]EventPair, error) {
 		return nil, err
 	}
 
-	var newPairs []EventPair
+	var newPairs []eventPair
 
 	for _, trNode := range trNodes {
-		var eventPair EventPair
+		var eventPair eventPair
 
 		bookmakers, err := trNode.Search(`.//td[3]/a`)
 		if err != nil {

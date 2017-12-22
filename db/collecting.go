@@ -78,7 +78,7 @@ func handleHtml(evPairs *set) chromedp.ActionFunc {
 		if err := chromedp.OuterHTML(s.Node, &html).Do(ctx, c); err != nil {
 			return err
 		}
-		newPairs, err := posit.ParseHtml(html)
+		newPairs, err := posit.Parse(html)
 		if err != nil {
 			return err
 		}
