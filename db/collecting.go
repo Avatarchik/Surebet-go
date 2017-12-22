@@ -13,11 +13,11 @@ import (
 	"time"
 )
 
-type eventPair = common.EventPair
+type eventPair = types.EventPair
 type set = types.SafeSet
 
 var s *common.SiteInfo
-var accounts *common.Accounts
+var accounts *types.Accounts
 
 func init() {
 	s = config.Sites.Posit

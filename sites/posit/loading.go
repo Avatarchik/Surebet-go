@@ -4,6 +4,7 @@ import (
 	"github.com/korovkinand/chromedp"
 	"github.com/korovkinand/surebetSearch/chrome"
 	"github.com/korovkinand/surebetSearch/common"
+	"github.com/korovkinand/surebetSearch/common/types"
 	"github.com/korovkinand/surebetSearch/config"
 )
 
@@ -13,7 +14,7 @@ func init() {
 	s = config.Sites.Posit
 }
 
-func InitLoad(account common.Account) chromedp.Tasks {
+func InitLoad(account types.Account) chromedp.Tasks {
 	var res []byte
 	return chromedp.Tasks{
 		chromedp.Navigate(s.Url),

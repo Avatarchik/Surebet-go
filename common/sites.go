@@ -1,9 +1,12 @@
 package common
 
 import (
+	"github.com/korovkinand/surebetSearch/common/types"
 	"time"
 	"unicode"
 )
+
+type accounts = types.Accounts
 
 type Time struct {
 	Sleep time.Duration `json:"sleep,omitempty"`
@@ -13,13 +16,13 @@ type Time struct {
 type Map map[string]string
 
 type SiteInfo struct {
-	Url   string `json:"url"`
-	Time  *Time  `json:"time,omitempty"`
-	Rng   *Range `json:"range,omitempty"`
-	Node  string `json:"node,omitempty"`
-	Sel   Map    `json:"sel,omitempty"`
-	Js    Map    `json:"js,omitempty"`
-	XPath Map    `json:"xpath,omitempty"`
+	Url   string       `json:"url"`
+	Time  *Time        `json:"time,omitempty"`
+	Rng   *types.Range `json:"range,omitempty"`
+	Node  string       `json:"node,omitempty"`
+	Sel   Map          `json:"sel,omitempty"`
+	Js    Map          `json:"js,omitempty"`
+	XPath Map          `json:"xpath,omitempty"`
 
 	name, fullName string
 }
@@ -44,15 +47,15 @@ type AccountsInfo struct {
 	Fonbet,
 	Marat,
 	Olimp,
-	Posit *Accounts
+	Posit *accounts
 }
 
 func MakeAccountsInfo() AccountsInfo {
 	return AccountsInfo{
-		&Accounts{},
-		&Accounts{},
-		&Accounts{},
-		&Accounts{},
+		&accounts{},
+		&accounts{},
+		&accounts{},
+		&accounts{},
 	}
 }
 

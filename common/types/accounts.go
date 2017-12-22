@@ -1,4 +1,4 @@
-package common
+package types
 
 type Account struct {
 	Login    string `json:"login"`

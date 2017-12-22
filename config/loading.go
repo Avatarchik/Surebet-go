@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/korovkinand/surebetSearch/common"
+	"github.com/korovkinand/surebetSearch/common/types"
 	"log"
 )
 
@@ -32,7 +33,7 @@ func loadSites() error {
 }
 
 func loadAccounts() error {
-	var accounts []common.Account
+	var accounts []types.Account
 	if err := common.LoadJson(accountsDir+posit, &accounts); err != nil {
 		return err
 	}

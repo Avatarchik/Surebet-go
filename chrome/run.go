@@ -2,9 +2,8 @@ package chrome
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"github.com/korovkinand/chromedp"
+	"github.com/korovkinand/surebetSearch/common"
 	"github.com/korovkinand/surebetSearch/config/chrome"
 	"log"
 )
@@ -31,7 +30,7 @@ func RunPool(targetNumber int) error {
 		if err != nil {
 			ClosePool()
 			log.Println("Pool allocating error")
-			return fmt.Errorf("instance (%d) error: %v", i, err)
+			return common.NewStackErrorf("instance (%d) error: %v", i, err)
 		}
 	}
 
@@ -47,7 +46,7 @@ func RunActions(actions ...action) error {
 	targetNumber := len(targets)
 
 	if targetNumber != len(actions) {
-		return errors.New("numbers of actions and targets aren't equal")
+		return common.NewStackError("numbers of actions and targets aren't equal")
 	}
 
 	errChan := make(chan errorInfo, targetNumber)

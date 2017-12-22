@@ -1,8 +1,8 @@
 package common
 
 import (
-	"fmt"
 	"github.com/jbowtie/gokogiri/xml"
+	"github.com/korovkinand/surebetSearch/common/types"
 	"strconv"
 	"strings"
 )
@@ -11,12 +11,12 @@ func ReformatSpaces(s string) string {
 	return strings.Join(strings.Fields(s), " ")
 }
 
-func ParseFactor(s string) (Factor, error) {
+func ParseFactor(s string) (types.Factor, error) {
 	value, err := strconv.ParseFloat(strings.TrimSpace(s), 64)
 	if err != nil {
-		return Factor(0), err
+		return types.Factor(0), err
 	}
-	return Factor(value), err
+	return types.Factor(value), err
 }
 
 func SearchAndCheck(node xml.Node, xpath string) ([]xml.Node, error) {
@@ -25,7 +25,7 @@ func SearchAndCheck(node xml.Node, xpath string) ([]xml.Node, error) {
 		return nil, err
 	}
 	if len(res) == 0 {
-		return nil, fmt.Errorf("node not found, xpath: %s", xpath)
+		return nil, NewStackErrorf("node not found, xpath: %s", xpath)
 	}
 
 	return res, nil

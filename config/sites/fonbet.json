@@ -1,16 +1,16 @@
 {
-	"url": "https://www.fonbet.com/live/?locale=en",
-	"node": "#lineTable",
-	"sel": {
-		"expand": "#lineTableHeaderButton",
-		"expandAll": "#lineHeaderViewActionMenu \u003e .popupMenuItem:nth-child(6)"
-	},
-	"js": {
-		"openNodes": "nodes = document.querySelectorAll('span[style=\"display: inline-block;\"].detailArrowClose')\nfor (cur_node = 0; cur_node \u003c nodes.length; cur_node++) {\n    nodes[cur_node].click()\n}"
-	},
-	"xpath": {
-		"table": "//body/table[@id=\"lineTable\"]/tbody",
-		"evName": "//td[contains(@class, \"eventCellName\")]/div[contains(@id, \"event\")]",
-		"grid": "//div[@class=\"detailsDIV\"]/table"
-	}
+  "url": "https://www.fonbet.com/live/?locale=en",
+  "node": "#lineTable",
+  "sel": {
+    "expand": "#lineTableHeaderButton",
+    "expandAll": "#lineHeaderViewActionMenu \u003e .popupMenuItem:nth-child(6)"
+  },
+  "js": {
+    "openNodes": "nodes = document.querySelectorAll('span[style=\"display: inline-block;\"].detailArrowClose')\nfor (cur_node = 0; cur_node \u003c nodes.length; cur_node++) {\n    nodes[cur_node].click()\n}"
+  },
+  "xpath": {
+    "table": "//body/table[@id=\"lineTable\"]/tbody",
+    "evName": "//td[contains(@class, \"eventCellName\")]/div[contains(@id, \"event\")]",
+    "grid": "//div[@class=\"detailsDIV\"]/table"
+  }
 }

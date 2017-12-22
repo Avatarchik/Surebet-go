@@ -28,13 +28,6 @@ func SaveScn(url string) chromedp.ActionFunc {
 	}
 }
 
-func WaitClick(sel interface{}) chromedp.Action {
-	return chromedp.Tasks{
-		chromedp.WaitReady(sel),
-		chromedp.Click(sel),
-	}
-}
-
 func LogLoaded(site, msg string) chromedp.ActionFunc {
 	return func(ctx context.Context, c cdp.Handler) error {
 		str := fmt.Sprintf("%s loaded", site)

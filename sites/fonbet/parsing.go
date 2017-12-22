@@ -1,18 +1,19 @@
 package fonbet
 
 import (
-	"errors"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 	"github.com/korovkinand/surebetSearch/common"
+	"github.com/korovkinand/surebetSearch/common/types"
 	"strconv"
 	"strings"
 )
 
 type (
-	bets    = common.Bets
-	condBet = common.CondBet
-	event   = common.Event
+	bets    = types.Bets
+	condBet = types.CondBet
+	event   = types.Event
+	events  = types.Events
 )
 
 type eventInfo struct {
@@ -36,7 +37,7 @@ const (
 	trEventDetails = "trEventDetails"
 )
 
-func Parse(html string) (*common.Sports, error) {
+func Parse(html string) (*types.Sports, error) {
 	doc, err := gokogiri.ParseHtml([]byte(html))
 	if err != nil {
 		return nil, err
@@ -48,8 +49,8 @@ func Parse(html string) (*common.Sports, error) {
 		return nil, err
 	}
 
-	var bookmaker common.Sports
-	var allowedSports = map[string]*common.Events{
+	var bookmaker types.Sports
+	var allowedSports = map[string]*events{
 		"1": &bookmaker.Soccer,
 		"4": &bookmaker.Tennis,
 		"2": &bookmaker.Hockey,
@@ -58,7 +59,7 @@ func Parse(html string) (*common.Sports, error) {
 	}
 
 	var rowsInfo []rowInfo
-	var prevSport *common.Events
+	var prevSport *events
 
 	for _, rowNode := range rowNodes {
 		rowClass := strings.Split(rowNode.Attr("class"), " ")
@@ -66,7 +67,7 @@ func Parse(html string) (*common.Sports, error) {
 			continue
 		}
 		if len(rowClass) != 3 {
-			return nil, errors.New("attribute @class in rowNode not found")
+			return nil, common.NewStackError("attribute @class in rowNode not found")
 		}
 
 		sportColorEnd := 10
@@ -91,7 +92,7 @@ func Parse(html string) (*common.Sports, error) {
 	return &bookmaker, nil
 }
 
-func appendEvent(rowsInfo []rowInfo, sport *common.Events) error {
+func appendEvent(rowsInfo []rowInfo, sport *events) error {
 	if rowsInfo != nil {
 		event, err := parseEvent(rowsInfo)
 		if err != nil {
@@ -112,18 +113,18 @@ func parseEvent(rowsInfo []rowInfo) (event, error) {
 
 	teams := strings.Split(evInfo.name, "—")
 	if len(teams) != 2 || !strings.Contains(evInfo.name, "—") {
-		return event{}, errors.New("event name's struct has changed")
+		return event{}, common.NewStackError("event name's struct has changed")
 	}
 	ev := event{Team1: teams[0], Team2: teams[1], Parts: []bets{}}
 
 	partHandled := !evInfo.isBlocked
 	if partHandled {
-		eventBets, err := handleRow(node)
+		bets, err := handleRow(node)
 		if err != nil {
 			return event{}, err
 		}
-		eventBets.Part = 0
-		ev.Parts = append(ev.Parts, *eventBets)
+		bets.Part = 0
+		ev.Parts = append(ev.Parts, *bets)
 	}
 
 	for _, rowInfo := range rowsInfo[1:] {
@@ -149,13 +150,13 @@ func parseEvent(rowsInfo []rowInfo) (event, error) {
 					return event{}, err
 				}
 
-				eventBets, err := handleRow(node)
+				bets, err := handleRow(node)
 				if err != nil {
 					return event{}, err
 				}
-				eventBets.Part = partNum
+				bets.Part = partNum
 
-				ev.Parts = append(ev.Parts, *eventBets)
+				ev.Parts = append(ev.Parts, *bets)
 			}
 		}
 	}
@@ -168,13 +169,13 @@ func parseEventDetails(event *event, node xml.Node) error {
 		return err
 	}
 
-	evBets := &(event.Parts)[len(event.Parts)-1]
+	bets := &(event.Parts)[len(event.Parts)-1]
 
-	var allowedBets = map[string]*common.CondBets{
-		"Hcap":          &evBets.Hand,
-		"Totals":        &evBets.Total,
-		"Team Totals-1": &evBets.IndTotal1,
-		"Team Totals-2": &evBets.IndTotal2,
+	var allowedBets = map[string]*types.CondBets{
+		"Hcap":          &bets.Hand,
+		"Totals":        &bets.Total,
+		"Team Totals-1": &bets.IndTotal1,
+		"Team Totals-2": &bets.IndTotal2,
 	}
 
 	for _, gridNode := range gridNodes {
@@ -184,7 +185,7 @@ func parseEventDetails(event *event, node xml.Node) error {
 		}
 
 		caption := common.TrimSpaceNode(captionNode[0])
-		sport, ok := allowedBets[caption]
+		condBets, ok := allowedBets[caption]
 		if !ok {
 			continue
 		}
@@ -208,7 +209,7 @@ func parseEventDetails(event *event, node xml.Node) error {
 			if err != nil {
 				return err
 			}
-			sport.AppendNotEmpty(condBet)
+			condBets.AppendNotEmpty(condBet)
 		}
 	}
 	return nil
@@ -243,20 +244,20 @@ func getEventInfo(rowNode xml.Node) (eventInfo, error) {
 }
 
 func handleRow(rowNode xml.Node) (*bets, error) {
-	var evBets bets
+	var bets bets
 
 	colNodes, err := common.SearchAndCheck(rowNode, `.//td`)
 	if err != nil {
 		return nil, err
 	}
 
-	var betAttrs = map[string]*common.Factor{
-		"O1":  &evBets.O1,
-		"OX":  &evBets.OX,
-		"O2":  &evBets.O2,
-		"O1X": &evBets.O1X,
-		"O12": &evBets.O12,
-		"OX2": &evBets.OX2,
+	var betAttrs = map[string]*types.Factor{
+		"O1":  &bets.O1,
+		"OX":  &bets.OX,
+		"O2":  &bets.O2,
+		"O1X": &bets.O1X,
+		"O12": &bets.O12,
+		"OX2": &bets.OX2,
 	}
 	for idx, betName := range []string{"O1", "OX", "O2", "O1X", "O12", "OX2"} {
 		textNode, err := common.SearchText(colNodes[idx+3])
@@ -278,19 +279,19 @@ func handleRow(rowNode xml.Node) (*bets, error) {
 		return nil, err
 	}
 
-	evBets.Hand.AppendNotEmpty(handBet)
+	bets.Hand.AppendNotEmpty(handBet)
 
 	totalBet, err := handleCondBet(colNodes[13:16], totalIDs)
 	if err != nil {
 		return nil, err
 	}
-	evBets.Total.AppendNotEmpty(totalBet)
+	bets.Total.AppendNotEmpty(totalBet)
 
-	return &evBets, nil
+	return &bets, nil
 }
 
 func handleCondBet(nodes []xml.Node, ids []int) (condBet, error) {
-	var factors []common.Factor
+	var factors []types.Factor
 	for _, id := range ids {
 		res, err := common.SearchText(nodes[id])
 		if err != nil {
@@ -298,7 +299,7 @@ func handleCondBet(nodes []xml.Node, ids []int) (condBet, error) {
 		}
 		length := len(res)
 		if length > 1 {
-			return condBet{}, errors.New("structure has changed: cond bet")
+			return condBet{}, common.NewStackError("structure has changed: cond bet")
 		}
 		if length == 1 {
 			factor, err := common.ParseFactor(res[0].String())
@@ -312,7 +313,7 @@ func handleCondBet(nodes []xml.Node, ids []int) (condBet, error) {
 		return condBet{}, nil
 	}
 	if len(factors) != 3 {
-		return condBet{}, errors.New("structure has changed: cond bet")
+		return condBet{}, common.NewStackError("structure has changed: cond bet")
 	}
 	return condBet{Cond: factors[0], V1: factors[1], V2: factors[2]}, nil
 }

@@ -3,6 +3,7 @@ package fonbet
 import (
 	"fmt"
 	"github.com/korovkinand/surebetSearch/common"
+	"github.com/korovkinand/surebetSearch/common/types"
 	"github.com/korovkinand/surebetSearch/config"
 	"io/ioutil"
 	"reflect"
@@ -20,7 +21,7 @@ func TestKnownResult(t *testing.T) {
 		t.Error(err)
 	}
 
-	sports := []*common.Events{
+	sports := []*events{
 		&bookmaker.Soccer,
 		&bookmaker.Tennis,
 		&bookmaker.Hockey,
@@ -34,7 +35,7 @@ func TestKnownResult(t *testing.T) {
 		}
 	}
 
-	var knownBM common.Sports
+	var knownBM types.Sports
 	if err := common.LoadJson(config.FonbetSamplesDir+"knownBookmaker", &knownBM); err != nil {
 		t.Error(err)
 	}

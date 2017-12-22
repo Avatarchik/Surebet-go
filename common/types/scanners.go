@@ -1,4 +1,4 @@
-package common
+package types
 
 type MatchEvent struct {
 	Site  string `json:"s"`
