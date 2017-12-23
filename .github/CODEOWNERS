@@ -1,0 +1,16 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence.
+*   @korovkinand
+
+# Order is important; the last matching pattern takes the most
+# precedence.
+/db/    @marshygeek
+/db/collecting.go   @korovkinand
+/db/collecting_test.go   @korovkinand
+
+/sites/fonbet/  @marshygeek
+/sites/fonbet/loading.go   @korovkinand
+/sites/fonbet/converting.go @korovkinand
+
+/sites/posit/   @marshygeek
+/sites/posit/loading.go @korovkinand
