@@ -25,7 +25,7 @@ func SearchAndCheck(node xml.Node, xpath string) ([]xml.Node, error) {
 		return nil, err
 	}
 	if len(res) == 0 {
-		return nil, NewStackErrorf("node not found, xpath: %s", xpath)
+		return nil, Errorf("node not found, xpath: %s", xpath)
 	}
 
 	return res, nil

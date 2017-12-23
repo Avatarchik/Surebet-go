@@ -67,7 +67,7 @@ func Parse(html string) (*types.Sports, error) {
 			continue
 		}
 		if len(rowClass) != 3 {
-			return nil, common.NewStackError("attribute @class in rowNode not found")
+			return nil, common.Error("attribute @class in rowNode not found")
 		}
 
 		sportColorEnd := 10
@@ -113,7 +113,7 @@ func parseEvent(rowsInfo []rowInfo) (event, error) {
 
 	teams := strings.Split(evInfo.name, "—")
 	if len(teams) != 2 || !strings.Contains(evInfo.name, "—") {
-		return event{}, common.NewStackError("event name's struct has changed")
+		return event{}, common.Error("event name's struct has changed")
 	}
 	ev := event{Team1: teams[0], Team2: teams[1], Parts: []bets{}}
 
@@ -299,7 +299,7 @@ func handleCondBet(nodes []xml.Node, ids []int) (condBet, error) {
 		}
 		length := len(res)
 		if length > 1 {
-			return condBet{}, common.NewStackError("structure has changed: cond bet")
+			return condBet{}, common.Error("structure has changed: cond bet")
 		}
 		if length == 1 {
 			factor, err := common.ParseFactor(res[0].String())
@@ -313,7 +313,7 @@ func handleCondBet(nodes []xml.Node, ids []int) (condBet, error) {
 		return condBet{}, nil
 	}
 	if len(factors) != 3 {
-		return condBet{}, common.NewStackError("structure has changed: cond bet")
+		return condBet{}, common.Error("structure has changed: cond bet")
 	}
 	return condBet{Cond: factors[0], V1: factors[1], V2: factors[2]}, nil
 }

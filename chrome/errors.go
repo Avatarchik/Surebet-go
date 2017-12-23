@@ -2,7 +2,6 @@ package chrome
 
 import (
 	"fmt"
-	"github.com/korovkinand/surebetSearch/common"
 )
 
 type errorInfo struct {
@@ -19,5 +18,5 @@ func (e *GoroutinesError) Error() string {
 	for _, errInfo := range e.errsInfo {
 		str += fmt.Sprintf("instance (%d): %v\n", errInfo.id, errInfo.err)
 	}
-	return fmt.Sprint(common.NewStackError(str))
+	return str
 }
