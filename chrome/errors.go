@@ -14,7 +14,7 @@ type GoroutinesError struct {
 }
 
 func (e *GoroutinesError) Error() string {
-	var str string
+	str := "Goroutine error:\n"
 	for _, errInfo := range e.errsInfo {
 		str += fmt.Sprintf("instance (%d): %v\n", errInfo.id, errInfo.err)
 	}
