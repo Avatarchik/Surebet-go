@@ -2,6 +2,7 @@ package common
 
 import (
 	"github.com/korovkinand/surebetSearch/common/types"
+	"strings"
 	"time"
 	"unicode"
 )
@@ -73,14 +74,14 @@ func (s *SiteInfo) FullName() string {
 		if err != nil {
 			name = "InvalidUrl"
 		}
-		s.fullName = name
+		s.fullName = strings.Title(name)
 	}
 	return s.fullName
 }
 
 func (s *SiteInfo) Name() string {
 	if s.name == "" {
-		name := s.FullName()
+		name := strings.ToLower(s.FullName())
 
 		const maxLen = 6
 		if len(name) > maxLen {
