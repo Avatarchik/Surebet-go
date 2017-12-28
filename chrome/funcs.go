@@ -20,21 +20,29 @@ func SaveScn(url string) chromedp.ActionFunc {
 		if err != nil {
 			return err
 		}
-		if err := ioutil.WriteFile(siteName+".png", buf, 0644); err != nil {
+		filename := siteName + ".png"
+		if err := ioutil.WriteFile(filename, buf, 0644); err != nil {
 			return err
 		}
-		log.Println("Screenshot saved")
+		log.Printf("Screenshot saved to file %s", filename)
 		return nil
 	}
 }
 
-func LogLoaded(site, msg string) chromedp.ActionFunc {
+func SiteLoaded(s *common.SiteInfo, msg string) chromedp.ActionFunc {
 	return func(ctx context.Context, c cdp.Handler) error {
-		str := fmt.Sprintf("%s loaded", site)
+		str := fmt.Sprintf("%s loaded", s.FullName())
 		if msg != "" {
 			str += fmt.Sprintf(": %s", msg)
 		}
 		log.Println(str)
+		return nil
+	}
+}
+
+func EventsLoaded(s *common.SiteInfo) chromedp.ActionFunc {
+	return func(ctx context.Context, c cdp.Handler) error {
+		log.Printf("%s events loaded", s.FullName())
 		return nil
 	}
 }

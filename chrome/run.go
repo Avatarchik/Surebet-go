@@ -2,6 +2,7 @@ package chrome
 
 import (
 	"context"
+	"fmt"
 	"github.com/korovkinand/chromedp"
 	"github.com/korovkinand/surebetSearch/common"
 	"github.com/korovkinand/surebetSearch/config/chrome"
@@ -16,8 +17,13 @@ var pool *chromedp.Pool
 var targets []*chromedp.Res
 
 func RunPool(targetNumber int) error {
+	poolOpts := []chromedp.PoolOption{chromedp.PortRange(chrome.StartPort, chrome.StartPort+targetNumber)}
+	if chrome.WithLog {
+		poolOpts = append(poolOpts, chromedp.PoolLog(log.Printf, log.Printf, log.Printf))
+	}
+
 	var err error
-	pool, err = chromedp.NewPool(chromedp.PortRange(chrome.StartPort, chrome.StartPort+targetNumber))
+	pool, err = chromedp.NewPool(poolOpts...)
 	if err != nil {
 		return err
 	}
@@ -26,7 +32,7 @@ func RunPool(targetNumber int) error {
 
 	targets = make([]*chromedp.Res, targetNumber)
 	for i := 0; i < targetNumber; i++ {
-		targets[i], err = pool.Allocate(ctx, chrome.Options...)
+		targets[i], err = pool.Allocate(ctx, chrome.RunnerOpts...)
 		if err != nil {
 			ClosePool()
 			log.Println("Pool allocating error")
@@ -39,14 +45,22 @@ func RunPool(targetNumber int) error {
 }
 
 func load(errChan chan errorInfo, target int, act action) {
-	errChan <- errorInfo{targets[target].Run(ctx, act), target}
+	err := targets[target].Run(ctx, act)
+
+	if err != nil {
+		log.Printf("Instance (%d) loading error:", target)
+		url := fmt.Sprintf("http://instance-%d-error.com", target)
+		targets[target].Run(ctx, SaveScn(url))
+	}
+
+	errChan <- errorInfo{err, target}
 }
 
 func RunActions(actions ...action) error {
 	targetNumber := len(targets)
 
 	if targetNumber != len(actions) {
-		return common.Error("numbers of actions and targets aren't equal")
+		return common.Error("numbers of actions and instances aren't equal")
 	}
 
 	errChan := make(chan errorInfo, targetNumber)
@@ -61,7 +75,6 @@ func RunActions(actions ...action) error {
 		}
 	}
 	if len(errsInfo) != 0 {
-		log.Println("Running actions error")
 		return &GoroutinesError{errsInfo}
 	}
 	return nil
@@ -77,5 +90,5 @@ func ClosePool() {
 			log.Panic(err)
 		}
 	}
-	log.Print("Pool closed")
+	log.Println("Pool closed")
 }

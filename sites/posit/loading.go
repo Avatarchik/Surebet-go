@@ -27,6 +27,6 @@ func InitLoad(account types.Account) chromedp.Tasks {
 		chromedp.WaitVisible(s.Node),
 		chromedp.Click(s.Sel["autoReloadBtn"]),
 		chromedp.Evaluate(s.Js["changeAmountBar"], &res),
-		chrome.LogLoaded(s.FullName(), account.Login),
+		chrome.SiteLoaded(s, account.Login),
 	}
 }

@@ -13,12 +13,12 @@ import (
 func TestKnownResult(t *testing.T) {
 	data, err := ioutil.ReadFile(config.FonbetSamplesDir + "KnownResult.html")
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	html := string(data)
 	bookmaker, err := Parse(html)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	sports := []*events{
@@ -37,21 +37,21 @@ func TestKnownResult(t *testing.T) {
 
 	var knownBM types.Sports
 	if err := common.LoadJson(config.FonbetSamplesDir+"knownBookmaker", &knownBM); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	if !reflect.DeepEqual(knownBM, *bookmaker) {
-		t.Error("not equal with known result")
+		t.Fatal("not equal with known result")
 	}
 }
 
 func TestBrokenStructure(t *testing.T) {
 	data, err := ioutil.ReadFile(config.FonbetSamplesDir + "BrokenStructure.html")
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	html := string(data)
 	if _, err := Parse(html); err == nil {
-		t.Error("no error on broken structure")
+		t.Fatal("no error on broken structure")
 	}
 }
 
@@ -59,11 +59,11 @@ func TestRealSamples(t *testing.T) {
 	for idx := 0; idx < 3; idx++ {
 		data, err := ioutil.ReadFile(fmt.Sprintf("%sSample%d.html", config.FonbetSamplesDir, idx))
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		html := string(data)
 		if _, err := Parse(html); err != nil {
-			t.Errorf("sample (%d): %v", idx, err)
+			t.Fatalf("sample (%d): %v", idx, err)
 		}
 	}
 }

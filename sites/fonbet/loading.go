@@ -19,11 +19,14 @@ func InitLoad() chromedp.Tasks {
 		chromedp.Click(s.Sel["expand"]),
 		chromedp.Click(s.Sel["expandAll"]),
 		chromedp.WaitNotVisible(s.Sel["expandAll"]),
-		chrome.LogLoaded(s.FullName(), ""),
+		chrome.SiteLoaded(s, ""),
 	}
 }
 
-func ExpandEvents() chromedp.Action {
+func LoadEvents() chromedp.Tasks {
 	var res []byte
-	return chromedp.Evaluate(s.Js["openNodes"], &res)
+	return chromedp.Tasks{
+		chromedp.Evaluate(s.Js["openNodes"], &res),
+		chrome.EventsLoaded(s),
+	}
 }
