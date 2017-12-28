@@ -27,7 +27,7 @@ func TestFullNames(t *testing.T) {
 	}
 	for siteNum, fullName := range fullNames {
 		if fullName != sitesList[siteNum].FullName() {
-			t.Error("full name isn't equal with known result")
+			t.Fatal("full name isn't equal with known result")
 		}
 	}
 }
@@ -41,7 +41,7 @@ func TestNames(t *testing.T) {
 	}
 	for siteNum, name := range names {
 		if name != sitesList[siteNum].Name() {
-			t.Error("name isn't equal with known result")
+			t.Fatal("name isn't equal with known result")
 		}
 	}
 }

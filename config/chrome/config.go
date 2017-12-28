@@ -7,7 +7,7 @@ import (
 const address = "0.0.0.0"
 const StartPort = 9222
 
-var Options = []runner.CommandLineOption{
+var RunnerOpts = []runner.CommandLineOption{
 	runner.ExecPath("/usr/bin/google-chrome"),
 	runner.Flag("headless", true),
 	runner.Flag("disable-gpu", true),
@@ -15,3 +15,5 @@ var Options = []runner.CommandLineOption{
 	runner.Flag("no-default-browser-check", true),
 	runner.Flag("remote-debugging-address", address),
 }
+
+var WithLog = false
